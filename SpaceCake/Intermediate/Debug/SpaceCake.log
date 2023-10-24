@@ -1,0 +1,3 @@
+﻿  WinMain.cpp
+C:\Users\Orrigine\source\repos\SpaceProject\SpaceCake\Source\WinMain.cpp(107,34): warning C4805: '==' : mélange risqué de type 'BOOL' et de type 'bool' dans l'opération
+  SpaceCake.vcxproj -> C:\Users\Orrigine\source\repos\SpaceProject\Build\SpaceCake\Debug\SpaceCake.exe
