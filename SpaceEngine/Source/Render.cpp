@@ -10,7 +10,7 @@ Render::Window::Window(){}
 Render::Window::~Window(){}
 
 
-LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK Render::Window::WindowProcess(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
     {
@@ -45,7 +45,7 @@ void Render::Window::CreateWindowClass()
     _wcex.lpszMenuName = nullptr;
 
     _wcex.hInstance = HInstance();
-    _wcex.lpfnWndProc = (WNDPROC)WindowProcess;
+    _wcex.lpfnWndProc = WindowProcess;
 
     RegisterClassEx(&_wcex);
 }
