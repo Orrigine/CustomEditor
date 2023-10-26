@@ -42,6 +42,9 @@
     <ClCompile Include="Source\SpaceEngine.cpp">
       <Filter>Source\pch</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Render.cpp">
+      <Filter>Source\Public</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Platform\WIN32\IApp.h">
@@ -52,6 +55,9 @@
     </ClInclude>
     <ClInclude Include="Source\SpaceEngine.h">
       <Filter>Source\pch</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Render.h">
+      <Filter>Source\Private</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

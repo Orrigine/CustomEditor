@@ -30,7 +30,7 @@
       <Filter>Source\pch</Filter>
     </ClCompile>
     <ClCompile Include="Source\WinMain.cpp">
-      <Filter>Source\Private</Filter>
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
