@@ -1,4 +1,4 @@
-#include "../../SpaceEngine.h"
+#include "Headers/SpaceEngine.h"
 #include "IApp.h"
 
 int main()

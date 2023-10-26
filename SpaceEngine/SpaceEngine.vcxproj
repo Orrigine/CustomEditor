@@ -57,6 +57,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>SpaceEngine.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -73,7 +74,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>SpaceEngine.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -83,14 +84,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Common\Source\Camera.cpp" />
+    <ClCompile Include="Common\Source\d3dApp.cpp" />
+    <ClCompile Include="Common\Source\d3dUtil.cpp" />
+    <ClCompile Include="Common\Source\DDSTextureLoader.cpp" />
+    <ClCompile Include="Common\Source\GameTimer.cpp" />
+    <ClCompile Include="Common\Source\GeometryGenerator.cpp" />
+    <ClCompile Include="Common\Source\MathHelper.cpp" />
     <ClCompile Include="Source\Platform\WIN32\IApp.cpp" />
     <ClCompile Include="Source\Render.cpp" />
     <ClCompile Include="Source\SpaceEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Common\Headers\Camera.h" />
+    <ClInclude Include="Common\Headers\d3dApp.h" />
+    <ClInclude Include="Common\Headers\d3dUtil.h" />
+    <ClInclude Include="Common\Headers\d3dx12.h" />
+    <ClInclude Include="Common\Headers\DDSTextureLoader.h" />
+    <ClInclude Include="Common\Headers\GameTimer.h" />
+    <ClInclude Include="Common\Headers\GeometryGenerator.h" />
+    <ClInclude Include="Common\Headers\MathHelper.h" />
+    <ClInclude Include="Common\Headers\UploadBuffer.h" />
+    <ClInclude Include="Headers\Render.h" />
     <ClInclude Include="Source\Platform\WIN32\IApp.h" />
     <ClInclude Include="Source\Platform\WIN32\WinEntry.h" />
-    <ClInclude Include="Source\Render.h" />
     <ClInclude Include="Source\SpaceEngine.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

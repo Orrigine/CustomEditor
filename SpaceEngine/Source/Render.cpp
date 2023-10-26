@@ -1,53 +1,59 @@
-#include "../Headers/Render.h" 
+#include "Headers/SpaceEngine.h"
+#include <Windows.h>
+#include <string>
+#include "Headers/Render.h"
+
+WCHAR WindowClass[MAX_NAME_STRING] = L"SpaceEngineWindowClass";
+
 
 Render::Window::Window(){}
 Render::Window::~Window(){}
 
-int CALLBACK Render::Window::WinMain(HINSTANCE, HINSTANCE, LPSTR, INT)
+
+LRESULT CALLBACK WindowProcess(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-
-    InitializeVariables();
-    CreateWindowClass();
-    InitializeWindow();
-    MessageLoop();
-
+    switch (msg)
+    {
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        break;
+    default:
+        return DefWindowProc(hwnd, msg, wParam, lParam);
+    }
     return 0;
 }
-private void  Render::Window::InitializeVariables(int width, int height)
+
+void  Render::Window::InitializeVariables(int width, int height)
 {
 
-    WindowHeight = height;
-    WindowWidth = width;
+    _windowHeight = height;
+    _windowWidth = width;
 }
 
-private void Render::Window::CreateWindowClass()
+void Render::Window::CreateWindowClass()
 {
-    WNDCLASSEX wcex = { 0 };
-    wcex.cbSize = sizeof(WNDCLASSEX);
-    wcex.style = CS_HREDRAW | CS_VREDRAW; // Redraw on horizontal or vertical movement/adjustment
-    wcex.cbClsExtra = 0;
-    wcex.cbWndExtra = 0;
+    _wcex = {};
+    _wcex.cbSize = sizeof(WNDCLASSEX);
+    _wcex.style = CS_HREDRAW | CS_VREDRAW; // Redraw on horizontal or vertical movement/adjustment
+    _wcex.cbClsExtra = 0;
+    _wcex.cbWndExtra = 0;
 
-    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);           // Load the arrow cursor
-    wcex.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH); // Set the background color to white
+    _wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);           // Load the arrow cursor
+    _wcex.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH); // Set the background color to white
 
-    wcex.hIcon = WindowIcon;
-    wcex.hIconSm = WindowIcon;
+    _wcex.lpszClassName = WindowClass;
+    _wcex.lpszMenuName = nullptr;
 
-    wcex.lpszClassName = WindowClass;
-    wcex.lpszMenuName = nullptr;
+    _wcex.hInstance = HInstance();
+    _wcex.lpfnWndProc = (WNDPROC)WindowProcess;
 
-    wcex.hInstance = HInstance();
-
-    wcex.lpfnWndProc = WindowProcess;
-
-    RegisterClassEx(&wcex);
+    RegisterClassEx(&_wcex);
 }
 
-private HWND  Render::Window::InitializeWindow(std::string name)
+HWND  Render::Window::InitializeWindow(LPCWSTR name)
 {
     HWND hWnd = CreateWindow(WindowClass, name, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
-        WindowWidth, WindowHeight, nullptr, /*menu*/ nullptr, HInstance(), /*spec instruct*/ nullptr);
+        _windowWidth, _windowHeight, nullptr, /*menu*/ nullptr, HInstance(), /*spec instruct*/ nullptr);
 
     if (!hWnd)
     {
@@ -55,21 +61,21 @@ private HWND  Render::Window::InitializeWindow(std::string name)
         PostQuitMessage(0);
     }
     ShowWindow(hWnd, SW_SHOW);
-    return hwnd;
+    return hWnd;
 }
 
-private void  Render::Window::MessageLoop()
+void  Render::Window::MessageLoop()
 {
     MSG msg = { 0 };
 
     if (msg.message == WM_QUIT)
     {
-        WindowShouldClose = true;
+        _windowShouldClose = true;
     }
     while (msg.message != WM_QUIT)
     {
 
-        if (WindowShouldClose == true)
+        if (_windowShouldClose == true)
         {
             return;
         };
@@ -81,13 +87,13 @@ private void  Render::Window::MessageLoop()
     }
 }
 
-public HWND CALLBACK Render::Window::CreateWindow(std::string name, int width, int height)
+HWND CALLBACK Render::Window::CreateGameWindow(LPCWSTR name, int width, int height)
 {
     HWND returnWindow;
 
-    InitializeVariables();
+    InitializeVariables(width, height);
     CreateWindowClass();
-    returnWindow = InitializeWindow();
+    returnWindow = InitializeWindow(name);
     MessageLoop();
 
     return returnWindow;
