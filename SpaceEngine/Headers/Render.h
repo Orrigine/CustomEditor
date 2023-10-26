@@ -3,13 +3,17 @@
 #include "Common/Headers/MathHelper.h"
 #include "Common/Headers/UploadBuffer.h"
 
+
 namespace Render
 {
+
+
+
 	class Window
 	{
     private:
 
-        LRESULT CALLBACK WindowProcess(HWND, UINT, WPARAM, LPARAM);
+        static LRESULT CALLBACK WindowProcess(HWND, UINT, WPARAM, LPARAM);
         int CALLBACK WinMain(HINSTANCE, HINSTANCE, LPSTR, INT);
         void InitializeVariables(int, int);
         void CreateWindowClass();
