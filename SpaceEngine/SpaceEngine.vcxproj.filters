@@ -34,6 +34,15 @@
     <Filter Include="Source\Public\Platform\WIN32">
       <UniqueIdentifier>{143303e6-df67-4e56-9022-625025b4df94}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Utils">
+      <UniqueIdentifier>{00d4c439-79b4-46fd-8a8e-ba0b1a59d203}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Utils\Source">
+      <UniqueIdentifier>{c69ee2af-7e2e-400a-85a5-6de510910831}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Utils\Headers">
+      <UniqueIdentifier>{97c9f667-85fc-41f8-9887-5355b7c57cf4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Platform\WIN32\IApp.cpp">
@@ -44,6 +53,27 @@
     </ClCompile>
     <ClCompile Include="Source\Render.cpp">
       <Filter>Source\Public</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Source\Camera.cpp">
+      <Filter>Source\Utils\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Source\d3dApp.cpp">
+      <Filter>Source\Utils\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Source\d3dUtil.cpp">
+      <Filter>Source\Utils\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Source\DDSTextureLoader.cpp">
+      <Filter>Source\Utils\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Source\GameTimer.cpp">
+      <Filter>Source\Utils\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Source\GeometryGenerator.cpp">
+      <Filter>Source\Utils\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Source\MathHelper.cpp">
+      <Filter>Source\Utils\Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -56,7 +86,34 @@
     <ClInclude Include="Source\SpaceEngine.h">
       <Filter>Source\pch</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Render.h">
+    <ClInclude Include="Common\Headers\Camera.h">
+      <Filter>Source\Utils\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Headers\d3dApp.h">
+      <Filter>Source\Utils\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Headers\d3dUtil.h">
+      <Filter>Source\Utils\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Headers\d3dx12.h">
+      <Filter>Source\Utils\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Headers\DDSTextureLoader.h">
+      <Filter>Source\Utils\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Headers\GameTimer.h">
+      <Filter>Source\Utils\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Headers\GeometryGenerator.h">
+      <Filter>Source\Utils\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Headers\MathHelper.h">
+      <Filter>Source\Utils\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Headers\UploadBuffer.h">
+      <Filter>Source\Utils\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Render.h">
       <Filter>Source\Private</Filter>
     </ClInclude>
   </ItemGroup>
