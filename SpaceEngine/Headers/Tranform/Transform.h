@@ -11,7 +11,6 @@ struct TRANSFORM {
 	DirectX::XMFLOAT4 qRot;
 	DirectX::XMMATRIX mRot;
 
-
 	DirectX::XMFLOAT3 vOrigin;
 	DirectX::XMMATRIX mOrigin;
 };
