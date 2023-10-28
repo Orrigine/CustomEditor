@@ -1,6 +1,5 @@
 #include "Headers/pch.h"
-#include "Headers/Render.h"
-#include <iostream>
+
 using namespace std;
 #pragma region Global Variables
 
@@ -11,4 +10,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 {
 
     Render::Window::GetInstance()->CreateGameWindow(L"HAHA", 50, 50);
+	if (Engine::Keyboard::GetInstance()->KeyDown(Engine::Keyboard::Key::A))
+	{
+		Render::Window::GetInstance()->CreateGameWindow(L"HUHU", 450, 50);
+	}
 }

@@ -3,6 +3,7 @@
 #include "Common/Headers/d3dApp.h"
 #include "Common/Headers/MathHelper.h"
 #include "Common/Headers/UploadBuffer.h"
+#include "Headers/Keyboard.h"
 #include <memory.h>
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "Gdi32.lib")
@@ -21,7 +22,6 @@ namespace Render
         HWND InitializeWindow(LPCWSTR);
         void MessageLoop();
         WNDCLASSEX _wcex;
-
         bool _windowShouldClose;
         int _windowWidth;
         int _windowHeight;

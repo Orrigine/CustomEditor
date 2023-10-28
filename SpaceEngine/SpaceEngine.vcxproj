@@ -93,6 +93,7 @@
     <ClCompile Include="Common\Source\GameTimer.cpp" />
     <ClCompile Include="Common\Source\GeometryGenerator.cpp" />
     <ClCompile Include="Common\Source\MathHelper.cpp" />
+    <ClCompile Include="Source\Keyboard.cpp" />
     <ClCompile Include="Source\Platform\WIN32\IApp.cpp" />
     <ClCompile Include="Source\Render.cpp" />
     <ClCompile Include="Source\SpaceEngine.cpp" />
@@ -107,6 +108,7 @@
     <ClInclude Include="Common\Headers\GeometryGenerator.h" />
     <ClInclude Include="Common\Headers\MathHelper.h" />
     <ClInclude Include="Common\Headers\UploadBuffer.h" />
+    <ClInclude Include="Headers\Keyboard.h" />
     <ClInclude Include="Headers\Render.h" />
     <ClInclude Include="Headers\SpaceEngine.h" />
     <ClInclude Include="Source\Platform\WIN32\IApp.h" />

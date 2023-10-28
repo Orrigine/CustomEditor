@@ -20,6 +20,12 @@ LRESULT CALLBACK Render::Window::WindowProcess(HWND hwnd, UINT msg, WPARAM wPara
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
+	case WM_KEYDOWN:
+		Engine::Keyboard::GetInstance()->IsPressed((int)wParam);
+		break;
+	case WM_KEYUP:
+		Engine::Keyboard::GetInstance()->IsReleased((int)wParam);
+		break;
 	default:
 		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}

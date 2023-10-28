@@ -75,6 +75,9 @@
     <ClCompile Include="Common\Source\MathHelper.cpp">
       <Filter>Source\Utils\Source</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Keyboard.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Platform\WIN32\IApp.h">
@@ -115,6 +118,9 @@
     </ClInclude>
     <ClInclude Include="Headers\SpaceEngine.h">
       <Filter>Source\pch</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Keyboard.h">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

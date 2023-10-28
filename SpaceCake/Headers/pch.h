@@ -2,6 +2,8 @@
 
 #include <Windows.h>
 #include "Headers/Render.h"
+#include "Common/Headers/d3dutil.h"
+#include <iostream>
 
 #define MAX_NAME_STRING 256
 #define HInstance() GetModuleHandle(NULL)
