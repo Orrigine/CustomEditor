@@ -83,9 +83,6 @@
     <ClInclude Include="Source\Platform\WIN32\WinEntry.h">
       <Filter>Source\Public\Platform\WIN32</Filter>
     </ClInclude>
-    <ClInclude Include="Source\SpaceEngine.h">
-      <Filter>Source\pch</Filter>
-    </ClInclude>
     <ClInclude Include="Common\Headers\Camera.h">
       <Filter>Source\Utils\Headers</Filter>
     </ClInclude>
@@ -115,6 +112,9 @@
     </ClInclude>
     <ClInclude Include="Headers\Render.h">
       <Filter>Source\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\SpaceEngine.h">
+      <Filter>Source\pch</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

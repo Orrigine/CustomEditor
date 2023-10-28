@@ -1,21 +1,14 @@
 #include "Headers/pch.h"
+#include "Headers/Render.h"
 #include <iostream>
 using namespace std;
 #pragma region Global Variables
 
-WCHAR WindowClass[MAX_NAME_STRING] = L"WinClass";
-WCHAR WindowTitle[MAX_NAME_STRING] = L"MY EFFING WINDOW";
-
-INT WindowHeight;
-INT WindowWidth;
-
-BOOL WindowShouldClose;
-
-HICON WindowIcon;
 #pragma endregion
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
-    PSTR cmdLine, int showCmd)
+	PSTR cmdLine, int showCmd)
 {
-    return 0;
+
+    Render::Window::GetInstance()->CreateGameWindow(L"HAHA", 50, 50);
 }

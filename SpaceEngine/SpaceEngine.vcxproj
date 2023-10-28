@@ -58,6 +58,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>SpaceEngine.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -75,6 +76,7 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>SpaceEngine.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -106,9 +108,9 @@
     <ClInclude Include="Common\Headers\MathHelper.h" />
     <ClInclude Include="Common\Headers\UploadBuffer.h" />
     <ClInclude Include="Headers\Render.h" />
+    <ClInclude Include="Headers\SpaceEngine.h" />
     <ClInclude Include="Source\Platform\WIN32\IApp.h" />
     <ClInclude Include="Source\Platform\WIN32\WinEntry.h" />
-    <ClInclude Include="Source\SpaceEngine.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
