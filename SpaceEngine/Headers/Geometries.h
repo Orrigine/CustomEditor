@@ -18,7 +18,7 @@ namespace Render
 	
 	public:
 
-		Geometries(DirectX::XMFLOAT3 PosOrigin, DirectX::XMFLOAT4X4 RotationMatrix, OrderDraw myOrder[], Vertex myPoint[]);
+		Geometries(TRANSFORM );
 		~Geometries();
 		void AddPoint(Vertex newPoint[]);
 		void ChangeDrawOrdeer(int Line1, int Line2);
