@@ -1,16 +1,26 @@
 #pragma once
-#include "Headers/pch.h"
+#include<DirectXMath.h>
+#include<DirectXPackedVector.h>
+#define MAX_POINT 3 
+#define NULLXMFLOAT3 DirectX::XMFLOAT3{NULL, NULL, NULL}
+#define NULLVERTEX Vertex{{NULL, NULL, NULL},{ NULL,NULL,NULL,NULL }}
+#define NULLMATRIX DirectX::XMMATRIX{{NULL,NULL,NULL,NULL},{NULL,NULL,NULL,NULL},{NULL,NULL,NULL,NULL},{NULL,NULL,NULL,NULL}}
+
 
 struct TRANSFORM {
-	DirectX::XMFLOAT3 vScale;
-	DirectX::XMMATRIX mScale;
+	DirectX::XMFLOAT3 vScale = NULLXMFLOAT3;
+	DirectX::XMMATRIX mScale = NULLMATRIX;
 
-	DirectX::XMFLOAT3 vTranslation;
-	DirectX::XMMATRIX mTranslation;
-
-	DirectX::XMFLOAT4 qRot;
-	DirectX::XMMATRIX mRot;
-
-	DirectX::XMFLOAT3 vOrigin;
-	DirectX::XMMATRIX mOrigin;
+	DirectX::XMFLOAT3 vTranslation = NULLXMFLOAT3;
+	DirectX::XMMATRIX mTranslation = NULLMATRIX;
+	DirectX::XMMATRIX mRot = NULLMATRIX;
+};
+struct Vertex
+{
+	DirectX::XMFLOAT3 position;
+	DirectX::XMFLOAT4 color;
+};
+struct OrderDraw
+{
+	float DrawOrder[3];
 };
