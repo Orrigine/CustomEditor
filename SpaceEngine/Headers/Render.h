@@ -7,8 +7,12 @@
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "Gdi32.lib")
 
+
 namespace Render
 {
+
+
+
 	class Window
 	{
     private:
