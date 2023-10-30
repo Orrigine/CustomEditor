@@ -8,7 +8,7 @@
 #include "Entity.hpp"
 
 namespace SpaceEngine {
-    Entity::Entity(entityType type, std::string name)
+    Entity::Entity(std::string type, std::string name)
     {
         _id = SpaceEngine::id + 1;
         _name = name;
@@ -25,7 +25,7 @@ namespace SpaceEngine {
         return (_id);
     }
 
-    entityType Entity::getType() const
+    std::string Entity::getType() const
     {
         return (_type);
     }

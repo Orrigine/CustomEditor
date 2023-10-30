@@ -12,15 +12,6 @@
 namespace SpaceEngine{
     static unsigned int id = 0;
 
-    /**
-     * @enum Engine::entityType : This enum handle the different types
-     * of entity
-     */
-    typedef enum {
-        CHARACTER,
-        BULLET
-    } entityType;
-
     class Entity {
         public:
         /**
@@ -29,7 +20,7 @@ namespace SpaceEngine{
          * @param type 
          * @param name 
          */
-        Entity(entityType type, std::string name = "");
+        Entity(std::string type, std::string name = "");
         /**
          * @brief Destroy the Entity object
          * 
@@ -46,7 +37,7 @@ namespace SpaceEngine{
          * 
          * @return entityType 
          */
-        entityType getType() const;
+        std::string getType() const;
         /**
          * @brief Return the entity's name
          * 
@@ -57,7 +48,7 @@ namespace SpaceEngine{
         protected:
             unsigned int _id;
             std::string _name;
-            entityType _type;
+            std::string _type;
     };
 }
 #endif /* !ENTITY_HPP_ */
