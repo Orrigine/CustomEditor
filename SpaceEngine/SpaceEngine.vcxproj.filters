@@ -51,9 +51,6 @@
     <ClCompile Include="Source\SpaceEngine.cpp">
       <Filter>Source\pch</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Render.cpp">
-      <Filter>Source\Public</Filter>
-    </ClCompile>
     <ClCompile Include="Common\Source\Camera.cpp">
       <Filter>Source\Utils\Source</Filter>
     </ClCompile>
@@ -74,6 +71,9 @@
     </ClCompile>
     <ClCompile Include="Common\Source\MathHelper.cpp">
       <Filter>Source\Utils\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Render.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -110,11 +110,14 @@
     <ClInclude Include="Common\Headers\UploadBuffer.h">
       <Filter>Source\Utils\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\Render.h">
-      <Filter>Source\Private</Filter>
-    </ClInclude>
     <ClInclude Include="Headers\SpaceEngine.h">
       <Filter>Source\pch</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Render.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics.h">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

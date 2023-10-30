@@ -19,9 +19,9 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -54,11 +54,12 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>SpaceEngine.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)SpaceEngine</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -93,8 +94,8 @@
     <ClCompile Include="Common\Source\GameTimer.cpp" />
     <ClCompile Include="Common\Source\GeometryGenerator.cpp" />
     <ClCompile Include="Common\Source\MathHelper.cpp" />
+    <ClCompile Include="Graphics\Render.cpp" />
     <ClCompile Include="Source\Platform\WIN32\IApp.cpp" />
-    <ClCompile Include="Source\Render.cpp" />
     <ClCompile Include="Source\SpaceEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -107,7 +108,8 @@
     <ClInclude Include="Common\Headers\GeometryGenerator.h" />
     <ClInclude Include="Common\Headers\MathHelper.h" />
     <ClInclude Include="Common\Headers\UploadBuffer.h" />
-    <ClInclude Include="Headers\Render.h" />
+    <ClInclude Include="Graphics.h" />
+    <ClInclude Include="Graphics\Render.h" />
     <ClInclude Include="Headers\SpaceEngine.h" />
     <ClInclude Include="Source\Platform\WIN32\IApp.h" />
     <ClInclude Include="Source\Platform\WIN32\WinEntry.h" />
