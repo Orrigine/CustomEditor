@@ -2,42 +2,31 @@
 
 #include "Tranform/Transform.h"
 
-
 namespace Render
 {
 	class Geometries {
 	
 	private:
-		DirectX::XMFLOAT3 m_PosOrigin;
-		DirectX::XMMATRIX m_rotation;
-		
-
-
 		OrderDraw m_DrawOrder [MAX_POINT];
-		Vertex m_PointList[MAX_POINT] = {NULLVERTEX};
+		Vertex m_PointList[] ;
 	
 	public:
 
-		Geometries(TRANSFORM );
+		Geometries();
 		~Geometries();
-		void AddPoint(Vertex newPoint[]);
-		void ChangeDrawOrdeer(int Line1, int Line2);
-		void ChangeLineInDraw(OrderDraw newOrder, int Line);
 
-		void TransformGeometries(TRANSFORM Transformation);
-		#pragma region OtherTransform
+		void DefineGeometries(Vertex Point[], OrderDraw DrawOrder[]);
 
-		void TransformGeometries(DirectX::XMFLOAT3 Translation);
-		void TransformGeometries(DirectX::XMMATRIX Translation);
+		void Triangle();
+		void Triangle(DirectX::XMFLOAT3 x, DirectX::XMFLOAT3 y, DirectX::XMFLOAT3 z);
 		
-		void TransformGeometries(DirectX::XMFLOAT3 Scale);
-		void TransformGeometries(DirectX::XMMATRIX Scale);
+		void Square();
+		void Square(DirectX::XMFLOAT3 a, DirectX::XMFLOAT3 b, DirectX::XMFLOAT3 c, DirectX::XMFLOAT3 d);
 
-		void TransformGeometries(DirectX::XMMATRIX RotationMatrix);
-
-#pragma endregion
-
-		DirectX::XMMATRIX GetRotationMatrix();
-		DirectX::XMFLOAT3 GetPosOrigin();
+		void Cube();
+		void Cube(
+			DirectX::XMFLOAT3 a, DirectX::XMFLOAT3 b, DirectX::XMFLOAT3 c, DirectX::XMFLOAT3 d,
+			DirectX::XMFLOAT3 e, DirectX::XMFLOAT3 f, DirectX::XMFLOAT3 g, DirectX::XMFLOAT3 h);
+		
 	};
 }

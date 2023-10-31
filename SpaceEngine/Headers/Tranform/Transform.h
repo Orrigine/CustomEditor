@@ -1,7 +1,7 @@
 #pragma once
 #include<DirectXMath.h>
 #include<DirectXPackedVector.h>
-#define MAX_POINT 3 
+#define MAX_POINT 10 
 #define NULLXMFLOAT3 DirectX::XMFLOAT3{NULL, NULL, NULL}
 #define NULLVERTEX Vertex{{NULL, NULL, NULL},{ NULL,NULL,NULL,NULL }}
 #define NULLMATRIX DirectX::XMMATRIX{{NULL,NULL,NULL,NULL},{NULL,NULL,NULL,NULL},{NULL,NULL,NULL,NULL},{NULL,NULL,NULL,NULL}}
@@ -22,5 +22,5 @@ struct Vertex
 };
 struct OrderDraw
 {
-	float DrawOrder[3];
+	float DrawOrder[3] = { NULL,NULL,NULL };
 };
