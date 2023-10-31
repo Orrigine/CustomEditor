@@ -12,29 +12,29 @@
 }
 #pragma endregion
 #pragma region Add, Set or Return Transform
-	void Entity::AddTrasnform(TRANSFORM addTransform)
+	void Entity::addTrasnform(TRANSFORM addTransform)
 {
 	this->m_Transform.mRot			+= addTransform.mRot;
 	this->m_Transform.vScale		= addTransform.vScale;	
 	this->m_Transform.vTranslation	= addTransform.vTranslation;
 }
-	void Entity::SetTransform(TRANSFORM newTransform)
+	void Entity::setTransform(TRANSFORM newTransform)
 {
 	this->m_Transform = newTransform;
 }
-	TRANSFORM* Entity::GetTransform()
+	TRANSFORM* Entity::getTransform()
 {
 	return &this->m_Transform;
 }
 #pragma endregion
 #pragma region Return Point, Order, ShaderFile
-	std::list<Vertex> Entity::ReturnPoint()
+	std::list<Vertex> Entity::returnPoint()
 {
 	std::list<Vertex> base;
 	for (const Vertex& c : this->m_Geometries->ReturnPoints()) {
 		base.push_back(
 			{
-				this->CalculPosReturn(c.position),
+				this->ralculPosReturn(c.position),
 				c.color
 			}
 		);
@@ -43,17 +43,17 @@
 
 	return base;
 }
-	std::list<float> Entity::ReturnOrderPoint()
+	std::list<float> Entity::returnOrderPoint()
 {
-	return this->m_Geometries->ReturnOrderDraw();
+	return this->m_Geometries->returnOrderDraw();
 }
-	std::string Entity::ReturnShaderFileName()
+	std::string Entity::returnShaderFileName()
 {
 	return *this->filename;
 }
 #pragma endregion
 #pragma region Calcul
-	DirectX::XMFLOAT3 Entity::CalculPosReturn(DirectX::XMFLOAT3 Pos)
+	DirectX::XMFLOAT3 Entity::calculPosReturn(DirectX::XMFLOAT3 Pos)
 {
 	//Scale
 	Pos = {

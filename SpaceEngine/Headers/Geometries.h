@@ -1,5 +1,5 @@
 #pragma once
-#include "Tranform/Transform.h"
+#include "Graphics/Render.h"
 #include <list>
 
 namespace Render
@@ -14,14 +14,14 @@ namespace Render
 			~Geometries();
 		#pragma endregion
 		#pragma region Define
-			void DefineGeometries(std::list<Vertex> Point, std::list < float> DrawOrder);
-			void Triangle();
-			void Square();
-			void Cube();
+			void defineGeometries(std::list<Vertex> Point, std::list < float> DrawOrder);
+			void triangle();
+			void square();
+			void cube();
 		#pragma endregion
 		#pragma region Return Points and Order
-			std::list<Vertex> ReturnPoints();
-			std::list<float> ReturnOrderDraw();
+			std::list<Vertex> returnPoints();
+			std::list<float> returnOrderDraw();
 		#pragma endregion
 	};
 }

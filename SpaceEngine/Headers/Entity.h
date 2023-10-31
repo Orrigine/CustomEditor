@@ -16,18 +16,18 @@ public:
 		~Entity();
 	#pragma endregion
 	#pragma region Add, Set or Return Transform
-		void AddTrasnform(TRANSFORM addTransform);
-		void SetTransform(TRANSFORM newTransform);
-		TRANSFORM* GetTransform();
+		void addTrasnform(TRANSFORM addTransform);
+		void setTransform(TRANSFORM newTransform);
+		TRANSFORM* getTransform();
 
 	#pragma endregion
 	#pragma region Return Point, Order, ShaderFile
-		std::list<Vertex> ReturnPoint();
-		std::list<float>ReturnOrderPoint();
-		std::string ReturnShaderFileName();
+		std::list<Vertex> returnPoint();
+		std::list<float>returnOrderPoint();
+		std::string returnShaderFileName();
 	#pragma endregion
 	#pragma region Calcul
-		DirectX::XMFLOAT3 CalculPosReturn(DirectX::XMFLOAT3 Pos);
+		DirectX::XMFLOAT3 calculPosReturn(DirectX::XMFLOAT3 Pos);
 	#pragma endregion
 };
 

@@ -9,13 +9,13 @@
 }
 #pragma endregion
 #pragma region Define
-	void Render::Geometries::DefineGeometries(std::list <Vertex> Point, std::list <float> DrawOrder)
+	void Render::Geometries::defineGeometries(std::list <Vertex> Point, std::list <float> DrawOrder)
 	{
 		this->m_PointList = Point;
 		this->m_DrawOrder = DrawOrder;
 
 	}
-	void Render::Geometries::Triangle()
+	void Render::Geometries::triangle()
 	{
 		this->m_PointList = {
 			{{-1,0,0},{0,0,0,0}},
@@ -26,7 +26,7 @@
 			{0,1,2},
 		};
 	}
-	void Render::Geometries::Square()
+	void Render::Geometries::square()
 	{
 		this->m_PointList = {
 			{{-1,1,0},{0,0,0,0}},
@@ -41,7 +41,7 @@
 			},
 		};
 	}
-	void Render::Geometries::Cube()
+	void Render::Geometries::cube()
 	{
 		this->m_PointList = {
 		{	{-1, 1, 0.5f}	,	{0,0,0,0}	},
@@ -79,11 +79,11 @@
 	}
 #pragma endregion
 #pragma region Return Points and Order
-	std::list<Vertex> Render::Geometries::ReturnPoints()
+	std::list<Vertex> Render::Geometries::returnPoints()
 	{
 		return this->m_PointList;
 	}
-	std::list<float> Render::Geometries::ReturnOrderDraw()
+	std::list<float> Render::Geometries::returnOrderDraw()
 	{
 		return this->m_DrawOrder;
 	}
