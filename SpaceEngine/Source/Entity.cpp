@@ -1,31 +1,34 @@
 #include "Headers/Entity.h"
 
-Entity::Entity(TRANSFORM transform, Render::Geometries* Geometries, std::string* filename)
+#pragma region Creation
+	Entity::Entity(TRANSFORM transform, Render::Geometries* Geometries, std::string* filename)
 {
 	this->m_Transform = transform;
 	this->m_Geometries = Geometries;
 	this->filename = filename;
 }
-Entity::~Entity()
+	Entity::~Entity()
 {
 }
-TRANSFORM* Entity::GetTransform()
-{
-	return &this->m_Transform;
-}
-void Entity::SetTransform(TRANSFORM newTransform)
-{
-	this->m_Transform = newTransform;
-}
-void Entity::AddTrasnform(TRANSFORM addTransform)
+#pragma endregion
+#pragma region Add, Set or Return Transform
+	void Entity::AddTrasnform(TRANSFORM addTransform)
 {
 	this->m_Transform.mRot			+= addTransform.mRot;
 	this->m_Transform.vScale		= addTransform.vScale;	
 	this->m_Transform.vTranslation	= addTransform.vTranslation;
 }
-
-
-std::list<Vertex> Entity::ReturnPoint()
+	void Entity::SetTransform(TRANSFORM newTransform)
+{
+	this->m_Transform = newTransform;
+}
+	TRANSFORM* Entity::GetTransform()
+{
+	return &this->m_Transform;
+}
+#pragma endregion
+#pragma region Return Point, Order, ShaderFile
+	std::list<Vertex> Entity::ReturnPoint()
 {
 	std::list<Vertex> base;
 	for (const Vertex& c : this->m_Geometries->ReturnPoints()) {
@@ -40,17 +43,17 @@ std::list<Vertex> Entity::ReturnPoint()
 
 	return base;
 }
-std::list<float> Entity::ReturnOrderPoint()
+	std::list<float> Entity::ReturnOrderPoint()
 {
 	return this->m_Geometries->ReturnOrderDraw();
 }
-
-std::string Entity::ReturnShaderFileName()
+	std::string Entity::ReturnShaderFileName()
 {
 	return *this->filename;
 }
-
-DirectX::XMFLOAT3 Entity::CalculPosReturn(DirectX::XMFLOAT3 Pos)
+#pragma endregion
+#pragma region Calcul
+	DirectX::XMFLOAT3 Entity::CalculPosReturn(DirectX::XMFLOAT3 Pos)
 {
 	//Scale
 	Pos = {
@@ -73,3 +76,4 @@ DirectX::XMFLOAT3 Entity::CalculPosReturn(DirectX::XMFLOAT3 Pos)
 
 	return Pos;
 }
+#pragma endregion
