@@ -1,24 +1,13 @@
-<<<<<<< HEAD
-#include "Headers/SpaceEngine.h"
-#include <Graphics.h>
-
-using namespace DirectX;
-=======
 #include <Graphics.h>
 
 using namespace Render;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 using Microsoft::WRL::ComPtr;
->>>>>>> 64d856f5246740da8a3fc088de775ed0e280362a
 
 WCHAR WindowClass[MAX_NAME_STRING] = L"SpaceEngineWindowClass";
 std::shared_ptr<Render::Window> Render::Window::_instance = nullptr;
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 64d856f5246740da8a3fc088de775ed0e280362a
 Render::Window::Window(HINSTANCE hInstance) : D3DApp(hInstance)
 {
     _wcex = {};
@@ -39,20 +28,12 @@ LRESULT CALLBACK Render::Window::WindowProcess(HWND hwnd, UINT msg, WPARAM wPara
     return 0;
 }
 
-<<<<<<< HEAD
-void Render::Window::InitializeVariables(int width, int height)
-{
-
-    _windowHeight = height;
-    _windowWidth = width;
-=======
 void Render::Window::InitializeVariables(/*std::wstring name,*/ int width, int height)
 {
 
     D3DApp::mClientWidth = width;
     D3DApp::mClientHeight = height;
     // D3DApp::mMainWindowName = name;
->>>>>>> 64d856f5246740da8a3fc088de775ed0e280362a
 }
 
 void Render::Window::CreateWindowClass()
@@ -120,18 +101,6 @@ void Render::Window::MessageLoop()
     }
 }
 
-<<<<<<< HEAD
-HWND CALLBACK Render::Window::CreateGameWindow(LPCWSTR name, int width, int height)
-{
-    HWND returnWindow;
-
-    InitializeVariables(width, height);
-    CreateWindowClass();
-    returnWindow = InitializeWindow(name);
-    MessageLoop();
-
-    return returnWindow;
-=======
 void CALLBACK Render::Window::CreateGameWindow(LPCWSTR name, int width, int height)
 {
 
@@ -139,7 +108,6 @@ void CALLBACK Render::Window::CreateGameWindow(LPCWSTR name, int width, int heig
     CreateWindowClass();
     Initialize();
     MessageLoop();
->>>>>>> 64d856f5246740da8a3fc088de775ed0e280362a
 }
 
 std::shared_ptr<Render::Window> Render::Window::GetInstance()
@@ -159,8 +127,6 @@ void Render::Window::OnResize()
 
 void Render::Window::Update(const GameTimer &gt)
 {
-<<<<<<< HEAD
-=======
     float x = mRadius * sinf(mPhi) * cosf(mTheta);
     float z = mRadius * sinf(mPhi) * sinf(mTheta);
     float y = mRadius * cosf(mPhi);
@@ -186,7 +152,6 @@ void Render::Window::Update(const GameTimer &gt)
     ObjectConstants objConstants;
     XMStoreFloat4x4(&objConstants.WorldViewProj, XMMatrixTranspose(worldViewProj));
     mObjectCB->CopyData(0, objConstants);
->>>>>>> 64d856f5246740da8a3fc088de775ed0e280362a
 }
 
 void Render::Window::Draw(const GameTimer &gt)
@@ -195,14 +160,6 @@ void Render::Window::Draw(const GameTimer &gt)
 
     ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 
-<<<<<<< HEAD
-    mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
-                                                                           D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
-
-    mCommandList->RSSetViewports(1, &mScreenViewport);
-    mCommandList->RSSetScissorRects(1, &mScissorRect);
-
-=======
     mCommandList->RSSetViewports(1, &mScreenViewport);
     mCommandList->RSSetScissorRects(1, &mScissorRect);
 
@@ -213,16 +170,10 @@ void Render::Window::Draw(const GameTimer &gt)
     // mCommandList->RSSetScissorRects(1, &mScissorRect);
 
     // Clear back & depth buffer.
->>>>>>> 64d856f5246740da8a3fc088de775ed0e280362a
     mCommandList->ClearRenderTargetView(CurrentBackBufferView(), Colors::LightSteelBlue, 0, nullptr);
     mCommandList->ClearDepthStencilView(DepthStencilView(),
                                         D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
-<<<<<<< HEAD
-    mCommandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
-    mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
-                                                                           D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
-=======
     // TODO: RENDER HERE
     //  Draw the box.
     mCommandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
@@ -246,7 +197,6 @@ void Render::Window::Draw(const GameTimer &gt)
     mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
                                                                            D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 
->>>>>>> 64d856f5246740da8a3fc088de775ed0e280362a
     // End of commands
     ThrowIfFailed(mCommandList->Close());
 
@@ -254,14 +204,6 @@ void Render::Window::Draw(const GameTimer &gt)
     ID3D12CommandList *cmdsLists[] = {mCommandList.Get()};
     mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
-<<<<<<< HEAD
-    ThrowIfFailed(mSwapChain->Present(0, 0));
-    mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
-
-    // Wait frame here
-    FlushCommandQueue();
-}
-=======
     ThrowIfFailed(mSwapChain->Present(/*60fps*/ 1, 0));
     mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
 
@@ -436,4 +378,3 @@ void Render::Window::BuildPSO()
     psoDesc.DSVFormat = mDepthStencilFormat;
     ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPSO)));
 }
->>>>>>> 64d856f5246740da8a3fc088de775ed0e280362a
