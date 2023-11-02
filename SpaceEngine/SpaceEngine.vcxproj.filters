@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Fichiers d%27en-tête">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Fichiers de ressources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source\Public">
+      <UniqueIdentifier>{d6f4793d-b462-46b0-a0cd-dc3a66683d0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Private">
+      <UniqueIdentifier>{eb21ad65-5e68-45f3-80d9-6ad519bbcc92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\pch">
+      <UniqueIdentifier>{2ba4d5db-bf49-4bfd-9930-ca5386cc2588}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Private\Platform">
+      <UniqueIdentifier>{b99029ae-5f7b-423c-b64c-aba57595ebe9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Private\Platform\WIN32">
+      <UniqueIdentifier>{c138204a-4693-496e-8f1c-82bc07130d4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Public\Platform">
+      <UniqueIdentifier>{e2fd666f-d32a-4cef-9928-7a0ea361fbfe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Public\Platform\WIN32">
+      <UniqueIdentifier>{143303e6-df67-4e56-9022-625025b4df94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Utils">
+      <UniqueIdentifier>{00d4c439-79b4-46fd-8a8e-ba0b1a59d203}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Utils\Source">
+      <UniqueIdentifier>{c69ee2af-7e2e-400a-85a5-6de510910831}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Utils\Headers">
+      <UniqueIdentifier>{97c9f667-85fc-41f8-9887-5355b7c57cf4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Platform\WIN32\IApp.cpp">
+      <Filter>Source\Private\Platform\WIN32</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SpaceEngine.cpp">
+      <Filter>Source\pch</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Source\Camera.cpp">
+      <Filter>Source\Utils\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Source\d3dApp.cpp">
+      <Filter>Source\Utils\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Source\d3dUtil.cpp">
+      <Filter>Source\Utils\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Source\DDSTextureLoader.cpp">
+      <Filter>Source\Utils\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Source\GameTimer.cpp">
+      <Filter>Source\Utils\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Source\GeometryGenerator.cpp">
+      <Filter>Source\Utils\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Source\MathHelper.cpp">
+      <Filter>Source\Utils\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Render.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Platform\WIN32\IApp.h">
+      <Filter>Source\Public\Platform\WIN32</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Platform\WIN32\WinEntry.h">
+      <Filter>Source\Public\Platform\WIN32</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Headers\Camera.h">
+      <Filter>Source\Utils\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Headers\d3dApp.h">
+      <Filter>Source\Utils\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Headers\d3dUtil.h">
+      <Filter>Source\Utils\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Headers\d3dx12.h">
+      <Filter>Source\Utils\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Headers\DDSTextureLoader.h">
+      <Filter>Source\Utils\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Headers\GameTimer.h">
+      <Filter>Source\Utils\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Headers\GeometryGenerator.h">
+      <Filter>Source\Utils\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Headers\MathHelper.h">
+      <Filter>Source\Utils\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Headers\UploadBuffer.h">
+      <Filter>Source\Utils\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\SpaceEngine.h">
+      <Filter>Source\pch</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Render.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
