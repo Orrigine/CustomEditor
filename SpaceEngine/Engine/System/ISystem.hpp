@@ -8,7 +8,7 @@
 #ifndef ISYSTEM_HPP_
 #define ISYSTEM_HPP_
 
-#include "../Entities.hpp"
+#include "../Entity.hpp"
 #include "../Components.hpp"
 #include "../ComponentManagers.hpp"
 #include <memory>
