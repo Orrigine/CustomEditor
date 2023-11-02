@@ -8,10 +8,5 @@ using namespace std;
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 	PSTR cmdLine, int showCmd)
 {
-
-    Render::Window::GetInstance()->CreateGameWindow(L"HAHA", 50, 50);
-	if (Engine::Keyboard::GetInstance()->KeyDown(Engine::Keyboard::Key::A))
-	{
-		Render::Window::GetInstance()->CreateGameWindow(L"HUHU", 450, 50);
-	}
+  Render::Window::GetInstance()->CreateGameWindow(L"HAHA", 1920, 500);
 }
