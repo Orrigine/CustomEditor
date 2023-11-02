@@ -19,7 +19,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -93,12 +93,6 @@
     <ClCompile Include="Common\Source\GameTimer.cpp" />
     <ClCompile Include="Common\Source\GeometryGenerator.cpp" />
     <ClCompile Include="Common\Source\MathHelper.cpp" />
-    <ClCompile Include="Engine\ComponentManager\ColorManager.cpp" />
-    <ClCompile Include="Engine\ComponentManager\HealthManager.cpp" />
-    <ClCompile Include="Engine\ComponentManager\MotionManager.cpp" />
-    <ClCompile Include="Engine\Component\Color.cpp" />
-    <ClCompile Include="Engine\Component\Health.cpp" />
-    <ClCompile Include="Engine\Component\Motion.cpp" />
     <ClCompile Include="Source\Platform\WIN32\IApp.cpp" />
     <ClCompile Include="Source\Render.cpp" />
     <ClCompile Include="Source\SpaceEngine.cpp" />
@@ -114,16 +108,8 @@
     <ClInclude Include="Common\Headers\GeometryGenerator.h" />
     <ClInclude Include="Common\Headers\MathHelper.h" />
     <ClInclude Include="Common\Headers\UploadBuffer.h" />
-    <ClInclude Include="Engine\ComponentManagers.hpp" />
-    <ClInclude Include="Engine\ComponentManager\ColorManager.hpp" />
-    <ClInclude Include="Engine\ComponentManager\HealthManager.hpp" />
-    <ClInclude Include="Engine\ComponentManager\IComponentManager.hpp" />
-    <ClInclude Include="Engine\ComponentManager\MotionManager.hpp" />
     <ClInclude Include="Engine\Components.hpp" />
-    <ClInclude Include="Engine\Component\Color.hpp" />
-    <ClInclude Include="Engine\Component\Health.hpp" />
     <ClInclude Include="Engine\Component\IComponent.hpp" />
-    <ClInclude Include="Engine\Component\Motion.hpp" />
     <ClInclude Include="Engine\Entity.hpp" />
     <ClInclude Include="Engine\Systems.hpp" />
     <ClInclude Include="Headers\Render.h" />

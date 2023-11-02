@@ -8,16 +8,18 @@
 #ifndef ENTITY_HPP_
 #define ENTITY_HPP_
 
+#include <Windows.h>
+
 #include <string>
 #include <vector>
 #include <memory>
 #include <unordered_map>
 #include "Component/IComponent.hpp"
 
-namespace SpaceEngine{
+namespace SpaceEngine {
     static unsigned int id = 0;
 
-    class Entity {
+    class Entity : public std::enable_shared_from_this<Entity> {
         public:
         Entity(std::string name, std::string type = "Default") 
         {
@@ -27,7 +29,8 @@ namespace SpaceEngine{
             _isActive = true;
             SpaceEngine::id += 1;
 
-            std::shared_ptr<Entity> ptr = std::make_shared<Entity>(this);
+            std::shared_ptr<Entity> ptr = shared_from_this();
+  //          std::shared_ptr<Entity> ptr = std::make_shared<Entity>(this);
             _entitiesMapId[_id] = ptr;
             _entitiesMapName[_name] = ptr;
             _entitiesMapType[_type].push_back(ptr);
@@ -61,7 +64,7 @@ namespace SpaceEngine{
         template<class T>
         std::shared_ptr<T> addComponent() {
             std::shared_ptr<T> component(new T());
-            T.addEntity(this->_id, component);
+            T::addEntity(this->_id, component);
             _componentsList.push_back(component);
         }
 
@@ -80,8 +83,8 @@ namespace SpaceEngine{
         std::vector<std::shared_ptr<V>> getComponents() {
             std::vector<std::shared_ptr<V>> components;
             for (int i = 0; i < _componentsList.size(); i++) {
-                if (dynamic_cast<std::shared_ptr<U>>(_componentsList[i]))
-                    components.push_back(dynamic_cast<std::shared_ptr<U>>(_componentsList[i]));
+                if (dynamic_cast<std::shared_ptr<V>>(_componentsList[i]))
+                    components.push_back(dynamic_cast<std::shared_ptr<V>>(_componentsList[i]));
             }
             return components;
         }
@@ -125,7 +128,7 @@ namespace SpaceEngine{
             std::string _name;
             std::string _type;
             bool _isActive;
-            std::vector<IComponent> _componentsList;
+            std::vector<std::shared_ptr<IComponent>> _componentsList;
             // It bind a type with all entities of this type
             // When creating a new entity we add it here with his tag
             // When changing his type we remove the entity from its previous 
@@ -135,5 +138,11 @@ namespace SpaceEngine{
             static std::unordered_map <std::string, std::shared_ptr<Entity>> _entitiesMapName;
             static std::unordered_map <unsigned int, std::shared_ptr<Entity>> _entitiesMapId;
     };
+
+    void print(std::string mess)
+    {
+        std::wstring res(mess.begin(), mess.end());
+        OutputDebugStringW(res.c_str());
+    }
 }
 #endif /* !ENTITY_HPP_ */
