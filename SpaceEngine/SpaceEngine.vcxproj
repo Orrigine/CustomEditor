@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -15,7 +15,7 @@
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{a4234ab0-4939-4b8c-a61b-4789ea8c46db}</ProjectGuid>
     <RootNamespace>SpaceEngine</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -95,8 +95,15 @@
     <ClCompile Include="Common\Source\GeometryGenerator.cpp" />
     <ClCompile Include="Common\Source\MathHelper.cpp" />
     <ClCompile Include="Graphics\Render.cpp" />
+    <ClCompile Include="Engine\ComponentManager\ColorManager.cpp" />
+    <ClCompile Include="Engine\ComponentManager\HealthManager.cpp" />
+    <ClCompile Include="Engine\ComponentManager\MotionManager.cpp" />
+    <ClCompile Include="Engine\Component\Color.cpp" />
+    <ClCompile Include="Engine\Component\Health.cpp" />
+    <ClCompile Include="Engine\Component\Motion.cpp" />
     <ClCompile Include="Source\Platform\WIN32\IApp.cpp" />
     <ClCompile Include="Source\SpaceEngine.cpp" />
+    <ClCompile Include="Engine\Component\Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Headers\Camera.h" />
@@ -110,9 +117,23 @@
     <ClInclude Include="Common\Headers\UploadBuffer.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Graphics\Render.h" />
+    <ClInclude Include="Engine\ComponentManagers.hpp" />
+    <ClInclude Include="Engine\ComponentManager\ColorManager.hpp" />
+    <ClInclude Include="Engine\ComponentManager\HealthManager.hpp" />
+    <ClInclude Include="Engine\ComponentManager\IComponentManager.hpp" />
+    <ClInclude Include="Engine\ComponentManager\MotionManager.hpp" />
+    <ClInclude Include="Engine\Components.hpp" />
+    <ClInclude Include="Engine\Component\Color.hpp" />
+    <ClInclude Include="Engine\Component\Health.hpp" />
+    <ClInclude Include="Engine\Component\IComponent.hpp" />
+    <ClInclude Include="Engine\Component\Motion.hpp" />
+    <ClInclude Include="Engine\Entity.hpp" />
+    <ClInclude Include="Engine\Systems.hpp" />
+    <ClInclude Include="Headers\Render.h" />
     <ClInclude Include="Headers\SpaceEngine.h" />
     <ClInclude Include="Source\Platform\WIN32\IApp.h" />
     <ClInclude Include="Source\Platform\WIN32\WinEntry.h" />
+    <ClInclude Include="Engine\Component\Transform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

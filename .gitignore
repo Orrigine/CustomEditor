@@ -139,6 +139,7 @@ StyleCopReport.xml
 *.pidb
 *.svclog
 *.scc
+*.vcxproj.user
 
 
 # Chutzpah Test files
@@ -459,3 +460,5 @@ Projet4/Projet4/x64/Debug/vc143.idb
 .vs/
 .vscode/
 .pdb
+SpaceCake/SpaceCake.vcxproj
+SpaceEngine/SpaceEngine.vcxproj
