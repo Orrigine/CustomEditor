@@ -24,10 +24,10 @@ namespace SpaceEngine {
              * 
              */
             virtual ~IComponent() = default;
+    //        static virtual void addEntity(unsigned int entityId, std::shared_ptr<IComponent> component) = 0;
         protected:
         private:
             // The entity this component is attached to
-            std::shared_ptr<Entity> _entity;
     };
 }
 

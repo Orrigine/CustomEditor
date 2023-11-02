@@ -84,15 +84,6 @@
     <ClCompile Include="Engine\Component\Motion.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Component\Position.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Component\Rotation.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Component\Scale.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\ComponentManager\ColorManager.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -100,15 +91,6 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Engine\ComponentManager\MotionManager.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\ComponentManager\PositionManager.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\ComponentManager\RotationManager.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\ComponentManager\ScaleManager.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Component\Transform.cpp">
@@ -167,15 +149,6 @@
     <ClInclude Include="Engine\Component\Motion.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Component\Position.hpp">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Component\Rotation.hpp">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Component\Scale.hpp">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\ComponentManager\ColorManager.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
@@ -186,15 +159,6 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="Engine\ComponentManager\MotionManager.hpp">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\ComponentManager\PositionManager.hpp">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\ComponentManager\RotationManager.hpp">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\ComponentManager\ScaleManager.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Entity.hpp">
