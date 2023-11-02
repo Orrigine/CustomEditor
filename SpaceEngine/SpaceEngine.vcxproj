@@ -93,6 +93,7 @@
     <ClCompile Include="Common\Source\GameTimer.cpp" />
     <ClCompile Include="Common\Source\GeometryGenerator.cpp" />
     <ClCompile Include="Common\Source\MathHelper.cpp" />
+    <ClCompile Include="Engine\Entity.cpp" />
     <ClCompile Include="Source\Platform\WIN32\IApp.cpp" />
     <ClCompile Include="Source\Render.cpp" />
     <ClCompile Include="Source\SpaceEngine.cpp" />

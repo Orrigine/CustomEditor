@@ -78,6 +78,9 @@
     <ClCompile Include="Engine\Component\Transform.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Entity.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Platform\WIN32\IApp.h">

@@ -1,9 +1,14 @@
 #include "Transform.h"
 
 namespace SpaceEngine {
+	std::unordered_map<unsigned int, std::shared_ptr<Transform>> Transform::_entitiesTransform = {};
+
 	Transform::Transform() : _position(new Vector3f), _rotation(new Vector3f),
 		_scale(new Vector3f)
 	{
+		setPosition({ 0.0f, 0.0f, 0.0f });
+		setRotation({ 0.0f, 0.0f, 0.0f });
+		setScale({ 1.0f, 1.0f, 1.0f });
 	}
 
 	Transform::~Transform()
