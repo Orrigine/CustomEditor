@@ -7,8 +7,16 @@
 
 #ifndef ICOMPONENT_HPP_
 #define ICOMPONENT_HPP_
+#include <memory>
+#include <unordered_map>
 
 namespace SpaceEngine {
+    struct Vector3f {
+        float x;
+        float y;
+        float z;
+    };
+
     class IComponent {
         public:
             /**
@@ -16,8 +24,10 @@ namespace SpaceEngine {
              * 
              */
             virtual ~IComponent() = default;
+    //        static virtual void addEntity(unsigned int entityId, std::shared_ptr<IComponent> component) = 0;
         protected:
         private:
+            // The entity this component is attached to
     };
 }
 
