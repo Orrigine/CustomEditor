@@ -1,7 +1,3 @@
-//***************************************************************************************
-// d3dApp.cpp by Frank Luna (C) 2015 All Rights Reserved.
-//***************************************************************************************
-
 #include "../Headers/d3dApp.h"
 #include <WindowsX.h>
 #include <Headers/SpaceEngine.h>

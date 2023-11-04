@@ -32,7 +32,7 @@ namespace Render
         virtual bool Initialize() override;
 
         static std::shared_ptr<Render::Window> GetInstance();
-        void CALLBACK CreateGameWindow(LPCWSTR, int, int);
+        // void CALLBACK CreateGameWindow(LPCWSTR, int, int);
         void InitializeVariables(/*std::wstring,*/ int, int);
 
     private:
@@ -46,7 +46,7 @@ namespace Render
         virtual void Draw(const GameTimer &gt) override;
 
         void BuildDescriptorHeaps();
-        void BuildConstantBuffers();
+        /*reste ici*/ void BuildConstantBuffers();
         void BuildRootSignature();
         void BuildShadersAndInputLayout();
         void BuildGeometry();
@@ -55,7 +55,12 @@ namespace Render
         static std::shared_ptr<Render::Window> _instance;
         static LRESULT CALLBACK WindowProcess(HWND, UINT, WPARAM, LPARAM);
         int CALLBACK WinMain(HINSTANCE, HINSTANCE, LPSTR, INT);
-        void CreateWindowClass();
+
+        static LRESULT CALLBACK HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+        static LRESULT CALLBACK HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+        LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+
+        // void CreateWindowClass();
         void MessageLoop();
 
     private:

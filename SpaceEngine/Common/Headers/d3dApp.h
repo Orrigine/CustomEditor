@@ -1,7 +1,3 @@
-//***************************************************************************************
-// d3dApp.h by Frank Luna (C) 2015 All Rights Reserved.
-//***************************************************************************************
-
 #pragma once
 // Link necessary d3d12 libraries.
 #pragma comment(lib, "d3dcompiler.lib")

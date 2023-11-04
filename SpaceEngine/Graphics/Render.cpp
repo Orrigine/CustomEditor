@@ -1,9 +1,5 @@
-#include <Graphics.h>
-
-using namespace Render;
-using namespace DirectX;
-using namespace DirectX::PackedVector;
-using Microsoft::WRL::ComPtr;
+#include "Headers/SpaceEngine.h"
+#include "Graphics/Render.h"
 
 WCHAR WindowClass[MAX_NAME_STRING] = L"SpaceEngineWindowClass";
 std::shared_ptr<Render::Window> Render::Window::_instance = nullptr;
@@ -15,18 +11,54 @@ Render::Window::Window(HINSTANCE hInstance) : D3DApp(hInstance)
 }
 Render::Window::~Window() {}
 
-LRESULT CALLBACK Render::Window::WindowProcess(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-    switch (msg)
-    {
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        break;
-    default:
-        return DefWindowProc(hwnd, msg, wParam, lParam);
-    }
-    return 0;
-}
+// LRESULT CALLBACK Render::Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+// {
+//     // use create parameter passed in from CreateWindow() to store window class pointer at WinAPI side
+//     if (msg == WM_NCCREATE)
+//     {
+//         // extract ptr to window class from creation data
+//         const CREATESTRUCTW *const pCreate = reinterpret_cast<CREATESTRUCTW *>(lParam);
+//         Window *const pWnd = static_cast<Window *>(pCreate->lpCreateParams);
+//         // set WinAPI-managed user data to store ptr to window instance
+//         SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
+//         // set message proc to normal (non-setup) handler now that setup is finished
+//         SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&Render::Window::HandleMsgThunk));
+//         // forward message to window instance handler
+//         return pWnd->HandleMsg(hWnd, msg, wParam, lParam);
+//     }
+//     // if we get a message before the WM_NCCREATE message, handle with default handler
+//     return DefWindowProc(hWnd, msg, wParam, lParam);
+// }
+
+// LRESULT CALLBACK Render::Window::HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+// {
+//     // retrieve ptr to window instance
+//     Window *const pWnd = reinterpret_cast<Window *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+//     // forward message to window instance handler
+//     return pWnd->HandleMsg(hWnd, msg, wParam, lParam);
+// }
+
+// LRESULT CALLBACK Render::Window::HandleMsg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+// {
+
+//     switch (msg)
+//     {
+//     case WM_DESTROY:
+//         PostQuitMessage(0);
+//         break;
+//         return 0;
+
+//         // we don't want the DefProc to handle this message because
+//         // we want our destructor to destroy the window, so return 0 instead of break
+//     case WM_CLOSE:
+//         PostQuitMessage(0);
+//         return 0;
+//         // clear keystate when window loses focus to prevent input getting "stuck"
+//         break;
+//     default:
+//         return DefWindowProc(hwnd, msg, wParam, lParam);
+//     }
+// }
 
 void Render::Window::InitializeVariables(/*std::wstring name,*/ int width, int height)
 {
@@ -36,31 +68,30 @@ void Render::Window::InitializeVariables(/*std::wstring name,*/ int width, int h
     // D3DApp::mMainWindowName = name;
 }
 
-void Render::Window::CreateWindowClass()
-{
-    _wcex.cbSize = sizeof(WNDCLASSEX);
-    _wcex.style = CS_HREDRAW | CS_VREDRAW; // Redraw on horizontal or vertical movement/adjustment
-    _wcex.cbClsExtra = 0;
-    _wcex.cbWndExtra = 0;
-
-    _wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);           // Load the arrow cursor
-    _wcex.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH); // Set the background color to white
-
-    _wcex.lpszClassName = WindowClass;
-    _wcex.lpszMenuName = nullptr;
-
-    _wcex.hInstance = HInstance();
-    _wcex.lpfnWndProc = WindowProcess;
-
-    RegisterClassEx(&_wcex);
-}
+// void Render::Window::CreateWindowClass()
+//{
+//     _wcex.cbSize = sizeof(WNDCLASSEX);
+//     _wcex.style = CS_HREDRAW | CS_VREDRAW; // Redraw on horizontal or vertical movement/adjustment
+//     _wcex.cbClsExtra = 0;
+//     _wcex.cbWndExtra = 0;
+//
+//     _wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);           // Load the arrow cursor
+//     _wcex.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH); // Set the background color to white
+//
+//     _wcex.lpszClassName = WindowClass;
+//     _wcex.lpszMenuName = nullptr;
+//
+//     _wcex.hInstance = HInstance();
+//     _wcex.lpfnWndProc = WindowProcess;
+//
+//     RegisterClassEx(&_wcex);
+// }
 
 bool Render::Window::Initialize()
 {
     if (!D3DApp::Initialize())
         return false;
 
-  
     BuildDescriptorHeaps();
     BuildConstantBuffers();
     BuildRootSignature();
@@ -101,14 +132,14 @@ void Render::Window::MessageLoop()
     }
 }
 
-void CALLBACK Render::Window::CreateGameWindow(LPCWSTR name, int width, int height)
-{
+// void CALLBACK Render::Window::CreateGameWindow(LPCWSTR name, int width, int height)
+// {
 
-    InitializeVariables(width, height);
-    CreateWindowClass();
-    Initialize();
-    MessageLoop();
-}
+//     InitializeVariables(width, height);
+//     CreateWindowClass();
+//     Initialize();
+//     MessageLoop();
+// }
 
 std::shared_ptr<Render::Window> Render::Window::GetInstance()
 {
@@ -139,11 +170,10 @@ void Render::Window::Update(const GameTimer &gt)
     XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
     XMStoreFloat4x4(&mView, view);
 
-
     // The window resized, so update the aspect ratio and recompute the projection matrix.
     XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
     XMStoreFloat4x4(&mProj, P);
-    
+
     XMMATRIX world = XMLoadFloat4x4(&mWorld);
     XMMATRIX proj = XMLoadFloat4x4(&mProj);
     XMMATRIX worldViewProj = world * view * proj;
@@ -207,10 +237,8 @@ void Render::Window::Draw(const GameTimer &gt)
     ThrowIfFailed(mSwapChain->Present(/*60fps*/ 1, 0));
     mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
 
-    
     // Wait frame here
     FlushCommandQueue();
-
 }
 
 void Render::Window::BuildDescriptorHeaps()

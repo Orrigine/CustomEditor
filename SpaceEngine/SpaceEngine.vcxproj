@@ -1,132 +1,130 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <ItemGroup Label="ProjectConfigurations">
-        <ProjectConfiguration Include="Debug|x64">
-            <Configuration>Debug</Configuration>
-            <Platform>x64</Platform>
-        </ProjectConfiguration>
-        <ProjectConfiguration Include="Release|x64">
-            <Configuration>Release</Configuration>
-            <Platform>x64</Platform>
-        </ProjectConfiguration>
-    </ItemGroup>
-    <PropertyGroup Label="Globals">
-        <VCProjectVersion>16.0</VCProjectVersion>
-        <Keyword>Win32Proj</Keyword>
-        <ProjectGuid>{a4234ab0-4939-4b8c-a61b-4789ea8c46db}</ProjectGuid>
-        <RootNamespace>SpaceEngine</RootNamespace>
-        <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
-    </PropertyGroup>
-    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-        <ConfigurationType>StaticLibrary</ConfigurationType>
-        <UseDebugLibraries>true</UseDebugLibraries>
-        <PlatformToolset>v143</PlatformToolset>
-        <CharacterSet>Unicode</CharacterSet>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-        <ConfigurationType>StaticLibrary</ConfigurationType>
-        <UseDebugLibraries>false</UseDebugLibraries>
-        <PlatformToolset>v143</PlatformToolset>
-        <WholeProgramOptimization>true</WholeProgramOptimization>
-        <CharacterSet>Unicode</CharacterSet>
-    </PropertyGroup>
-    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-    <ImportGroup Label="ExtensionSettings">
-    </ImportGroup>
-    <ImportGroup Label="Shared">
-    </ImportGroup>
-    <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-        <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"
-            Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')"
-            Label="LocalAppDataPlatform" />
-    </ImportGroup>
-    <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-        <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"
-            Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')"
-            Label="LocalAppDataPlatform" />
-    </ImportGroup>
-    <PropertyGroup Label="UserMacros" />
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-        <LinkIncremental>true</LinkIncremental>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-        <LinkIncremental>false</LinkIncremental>
-    </PropertyGroup>
-    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-        <ClCompile>
-            <WarningLevel>Level3</WarningLevel>
-            <SDLCheck>true</SDLCheck>
-            <PreprocessorDefinitions>_DEBUG;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-            <ConformanceMode>false</ConformanceMode>
-            <PrecompiledHeader>NotUsing</PrecompiledHeader>
-            <PrecompiledHeaderFile>SpaceEngine.h</PrecompiledHeaderFile>
-            <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)SpaceEngine</AdditionalIncludeDirectories>
-            <MultiProcessorCompilation>true</MultiProcessorCompilation>
-            <LanguageStandard>stdcpp17</LanguageStandard>
-        </ClCompile>
-        <Link>
-            <SubSystem>Console</SubSystem>
-            <GenerateDebugInformation>true</GenerateDebugInformation>
-        </Link>
-    </ItemDefinitionGroup>
-    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-        <ClCompile>
-            <WarningLevel>Level3</WarningLevel>
-            <FunctionLevelLinking>true</FunctionLevelLinking>
-            <IntrinsicFunctions>true</IntrinsicFunctions>
-            <SDLCheck>true</SDLCheck>
-            <PreprocessorDefinitions>NDEBUG;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-            <ConformanceMode>true</ConformanceMode>
-            <PrecompiledHeader>Create</PrecompiledHeader>
-            <PrecompiledHeaderFile>SpaceEngine.h</PrecompiledHeaderFile>
-            <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
-            <MultiProcessorCompilation>true</MultiProcessorCompilation>
-        </ClCompile>
-        <Link>
-            <SubSystem>Console</SubSystem>
-            <EnableCOMDATFolding>true</EnableCOMDATFolding>
-            <OptimizeReferences>true</OptimizeReferences>
-            <GenerateDebugInformation>true</GenerateDebugInformation>
-        </Link>
-    </ItemDefinitionGroup>
-    <ItemGroup>
-        <ClCompile Include="Common\Source\Camera.cpp" />
-        <ClCompile Include="Common\Source\d3dApp.cpp" />
-        <ClCompile Include="Common\Source\d3dUtil.cpp" />
-        <ClCompile Include="Common\Source\DDSTextureLoader.cpp" />
-        <ClCompile Include="Common\Source\GameTimer.cpp" />
-        <ClCompile Include="Common\Source\GeometryGenerator.cpp" />
-        <ClCompile Include="Common\Source\MathHelper.cpp" />
-        <ClCompile Include="Engine\Entity.cpp" />
-        <ClCompile Include="Graphics\Render.cpp" />
-        <ClCompile Include="Source\Platform\WIN32\IApp.cpp" />
-        <ClCompile Include="Source\SpaceEngine.cpp" />
-        <ClCompile Include="Engine\Component\Transform.cpp" />
-    </ItemGroup>
-    <ItemGroup>
-        <ClInclude Include="Common\Headers\Camera.h" />
-        <ClInclude Include="Common\Headers\d3dApp.h" />
-        <ClInclude Include="Common\Headers\d3dUtil.h" />
-        <ClInclude Include="Common\Headers\d3dx12.h" />
-        <ClInclude Include="Common\Headers\DDSTextureLoader.h" />
-        <ClInclude Include="Common\Headers\GameTimer.h" />
-        <ClInclude Include="Common\Headers\GeometryGenerator.h" />
-        <ClInclude Include="Common\Headers\MathHelper.h" />
-        <ClInclude Include="Common\Headers\UploadBuffer.h" />
-        <ClInclude Include="Engine\Components.hpp" />
-        <ClInclude Include="Engine\Component\IComponent.hpp" />
-        <ClInclude Include="Engine\Entity.hpp" />
-        <ClInclude Include="Engine\Systems.hpp" />
-        <ClInclude Include="Headers\Render.h" />
-        <ClInclude Include="Graphics.h" />
-        <ClInclude Include="Graphics\Render.h" />
-        <ClInclude Include="Headers\SpaceEngine.h" />
-        <ClInclude Include="Source\Platform\WIN32\IApp.h" />
-        <ClInclude Include="Source\Platform\WIN32\WinEntry.h" />
-        <ClInclude Include="Engine\Component\Transform.h" />
-    </ItemGroup>
-    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-    <ImportGroup Label="ExtensionTargets">
-    </ImportGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{a4234ab0-4939-4b8c-a61b-4789ea8c46db}</ProjectGuid>
+    <RootNamespace>SpaceEngine</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>false</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>SpaceEngine.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)SpaceEngine</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>SpaceEngine.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Common\Source\Camera.cpp" />
+    <ClCompile Include="Common\Source\d3dApp.cpp" />
+    <ClCompile Include="Common\Source\d3dUtil.cpp" />
+    <ClCompile Include="Common\Source\DDSTextureLoader.cpp" />
+    <ClCompile Include="Common\Source\GameTimer.cpp" />
+    <ClCompile Include="Common\Source\GeometryGenerator.cpp" />
+    <ClCompile Include="Common\Source\MathHelper.cpp" />
+    <ClCompile Include="Source\Keyboard.cpp" />
+    <ClCompile Include="Engine\Entity.cpp" />
+    <ClCompile Include="Graphics\Render.cpp" />
+    <ClCompile Include="Source\Platform\WIN32\IApp.cpp" />
+    <ClCompile Include="Source\SpaceEngine.cpp" />
+    <ClCompile Include="Engine\Component\Transform.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Common\Headers\Camera.h" />
+    <ClInclude Include="Common\Headers\d3dApp.h" />
+    <ClInclude Include="Common\Headers\d3dUtil.h" />
+    <ClInclude Include="Common\Headers\d3dx12.h" />
+    <ClInclude Include="Common\Headers\DDSTextureLoader.h" />
+    <ClInclude Include="Common\Headers\GameTimer.h" />
+    <ClInclude Include="Common\Headers\GeometryGenerator.h" />
+    <ClInclude Include="Common\Headers\MathHelper.h" />
+    <ClInclude Include="Common\Headers\UploadBuffer.h" />
+    <ClInclude Include="Headers\Keyboard.h" />
+    <ClInclude Include="Engine\Components.hpp" />
+    <ClInclude Include="Engine\Component\IComponent.hpp" />
+    <ClInclude Include="Engine\Entity.hpp" />
+    <ClInclude Include="Engine\Systems.hpp" />
+    <ClInclude Include="Headers\Render.h" />
+    <ClInclude Include="Graphics.h" />
+    <ClInclude Include="Graphics\Render.h" />
+    <ClInclude Include="Headers\SpaceEngine.h" />
+    <ClInclude Include="Source\Platform\WIN32\IApp.h" />
+    <ClInclude Include="Source\Platform\WIN32\WinEntry.h" />
+    <ClInclude Include="Engine\Component\Transform.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
 </Project>
