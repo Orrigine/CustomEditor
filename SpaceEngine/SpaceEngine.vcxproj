@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <ItemGroup Label="ProjectConfigurations">
         <ProjectConfiguration Include="Debug|x64">
@@ -98,9 +98,11 @@
         <ClCompile Include="Common\Source\GameTimer.cpp" />
         <ClCompile Include="Common\Source\GeometryGenerator.cpp" />
         <ClCompile Include="Common\Source\MathHelper.cpp" />
+        <ClCompile Include="Engine\Entity.cpp" />
         <ClCompile Include="Graphics\Render.cpp" />
         <ClCompile Include="Source\Platform\WIN32\IApp.cpp" />
         <ClCompile Include="Source\SpaceEngine.cpp" />
+        <ClCompile Include="Engine\Component\Transform.cpp" />
     </ItemGroup>
     <ItemGroup>
         <ClInclude Include="Common\Headers\Camera.h" />
@@ -112,11 +114,17 @@
         <ClInclude Include="Common\Headers\GeometryGenerator.h" />
         <ClInclude Include="Common\Headers\MathHelper.h" />
         <ClInclude Include="Common\Headers\UploadBuffer.h" />
+        <ClInclude Include="Engine\Components.hpp" />
+        <ClInclude Include="Engine\Component\IComponent.hpp" />
+        <ClInclude Include="Engine\Entity.hpp" />
+        <ClInclude Include="Engine\Systems.hpp" />
+        <ClInclude Include="Headers\Render.h" />
         <ClInclude Include="Graphics.h" />
         <ClInclude Include="Graphics\Render.h" />
         <ClInclude Include="Headers\SpaceEngine.h" />
         <ClInclude Include="Source\Platform\WIN32\IApp.h" />
         <ClInclude Include="Source\Platform\WIN32\WinEntry.h" />
+        <ClInclude Include="Engine\Component\Transform.h" />
     </ItemGroup>
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
     <ImportGroup Label="ExtensionTargets">
