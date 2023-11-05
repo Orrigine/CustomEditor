@@ -95,6 +95,7 @@
     <ClCompile Include="Common\Source\GeometryGenerator.cpp" />
     <ClCompile Include="Common\Source\MathHelper.cpp" />
     <ClCompile Include="Engine\Entity.cpp" />
+    <ClCompile Include="Graphics\FrameResource.cpp" />
     <ClCompile Include="Graphics\Render.cpp" />
     <ClCompile Include="Source\Platform\WIN32\IApp.cpp" />
     <ClCompile Include="Source\SpaceEngine.cpp" />
@@ -114,6 +115,7 @@
     <ClInclude Include="Engine\Component\IComponent.hpp" />
     <ClInclude Include="Engine\Entity.hpp" />
     <ClInclude Include="Engine\Systems.hpp" />
+    <ClInclude Include="Graphics\FrameResource.h" />
     <ClInclude Include="Headers\Render.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Graphics\Render.h" />
