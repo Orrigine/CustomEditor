@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Headers/SpaceEngine.h"
+#include "Graphics/ShaderBase.h"
 #include <memory.h>
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "Gdi32.lib")
@@ -45,12 +46,8 @@ namespace Render
         virtual void Update(const GameTimer &gt) override;
         virtual void Draw(const GameTimer &gt) override;
 
-        void BuildDescriptorHeaps();
-        /*reste ici*/ void BuildConstantBuffers();
-        void BuildRootSignature();
-        void BuildShadersAndInputLayout();
+        void BuildConstantBuffers();
         void BuildGeometry();
-        void BuildPSO();
 
         static std::shared_ptr<Render::Window> _instance;
         static LRESULT CALLBACK WindowProcess(HWND, UINT, WPARAM, LPARAM);
@@ -63,20 +60,15 @@ namespace Render
         // void CreateWindowClass();
         void MessageLoop();
 
-    private:
-        ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
-        ComPtr<ID3D12DescriptorHeap> mCbvHeap = nullptr;
+    protected:
+        D3D_DRIVER_TYPE md3dDriverType = D3D_DRIVER_TYPE_HARDWARE;
+        DXGI_FORMAT mBackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+        DXGI_FORMAT mDepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
+    private:
         std::unique_ptr<UploadBuffer<ObjectConstants>> mObjectCB = nullptr;
 
         std::unique_ptr<MeshGeometry> mBoxGeometry = nullptr;
-
-        ComPtr<ID3DBlob> mvsByteCode = nullptr;
-        ComPtr<ID3DBlob> mpsByteCode = nullptr;
-
-        std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
-
-        ComPtr<ID3D12PipelineState> mPSO = nullptr;
 
         XMFLOAT4X4 mWorld = MathHelper::Identity4x4();
         XMFLOAT4X4 mView = MathHelper::Identity4x4();
@@ -87,6 +79,8 @@ namespace Render
         float mRadius = 5.0f;
 
         POINT mLastMousePos;
+
+        ShaderBase *mShaderBase;
     };
 
 }
