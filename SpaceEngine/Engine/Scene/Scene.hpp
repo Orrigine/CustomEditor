@@ -10,6 +10,8 @@
 
 #include "Engine/Entity.hpp"
 #include "Engine/Components.hpp"
+#include "Graphics.h"
+#include "Engine/System/RenderSystem.h"
 
 namespace SpaceEngine {
         class Scene {
@@ -21,11 +23,14 @@ namespace SpaceEngine {
             //void lauchScene(std::string sceneName);
             void launchLoop();
             void setLoop(void (*loopPtr)(Scene*));
+            void setRenderApplication(std::shared_ptr<Render::Window> renderApplication);
+            std::unordered_map<unsigned int, std::shared_ptr<Entity>> getAllEntities();
         private:
             std::string _name;
             std::unordered_map<unsigned int, std::shared_ptr<Entity>> _entitiesMap;
             void (*_loopPtr)(Scene*);
             static std::unordered_map<std::string, Scene*> _sceneMap;
+            std::shared_ptr<Render::Window> _renderApplication;
         };
 }
 

@@ -3,7 +3,7 @@
 namespace SpaceEngine {
     
     Core::Core(HINSTANCE hInstance) : _hInstance(hInstance), _startScene(""),
-        _renderApplication(new Render::Window(hInstance))
+        _renderApplication(new Render::Window(hInstance)), _renderSystem(new RenderSystem())
     {
     }
 
@@ -27,11 +27,10 @@ namespace SpaceEngine {
     {
         try
         {
+            _renderSystem->init(&(_mapScene[_startScene]->getAllEntities()), _renderApplication);
             if (!_renderApplication->Initialize()) {
-                print("############################################################################\n");
                 return 84;
-            }
-            else
+            } else
                 return(_renderApplication->Run());
         }
         catch (DxException& e)
@@ -56,9 +55,13 @@ namespace SpaceEngine {
         _startScene = name;
     }
 
-    void Core::addScene(std::shared_ptr<Scene> scene)
+    std::shared_ptr<Scene>Core::createScene(std::string name)
     {
+        std::shared_ptr<Scene> scene(new Scene(name));
+
+        scene->setRenderApplication(_renderApplication);
         _mapScene[scene->getName()] = scene;
+        return scene;
     }
 
 };

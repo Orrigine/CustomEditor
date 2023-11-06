@@ -13,8 +13,8 @@ namespace SpaceEngine {
         void init();
         int run();
         void createWindow(int width, int height, std::wstring title);
-        void addScene(std::shared_ptr<Scene> scene);
-        void lauchScene(std::string name);
+        std::shared_ptr<Scene> createScene(std::string name);
+        //void lauchScene(std::string name);
         std::shared_ptr<Scene> getScene(std::string name);
         void setStartScene(std::string name);
         //void setWindow(/*win*/);
@@ -28,5 +28,6 @@ namespace SpaceEngine {
 
         std::string _startScene;
         std::unordered_map<std::string, std::shared_ptr<Scene>> _mapScene;
+        std::shared_ptr<RenderSystem> _renderSystem;
     };
 }

@@ -41,4 +41,14 @@ namespace SpaceEngine {
 	{
 		_loopPtr = loopPtr;
 	}
+
+	void Scene::setRenderApplication(std::shared_ptr<Render::Window> renderApplication)
+	{
+		_renderApplication = renderApplication;
+	}
+
+	std::unordered_map<unsigned int, std::shared_ptr<Entity>> Scene::getAllEntities()
+	{
+		return _entitiesMap;
+	}
 }

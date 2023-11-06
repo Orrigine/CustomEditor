@@ -10,24 +10,28 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
                    PSTR cmdLine, int showCmd)
 {
     SpaceEngine::Core core(hInstance);
+    std::shared_ptr<SpaceEngine::Scene> startScene = NULL;
+
     core.createWindow(800, 600, L"SpaceCake");
+    startScene = core.createScene("start");
+    core.setStartScene("start");
+
+    std::shared_ptr<SpaceEngine::Entity> cube_1 = startScene->createEntity("cube1");
+    std::shared_ptr<SpaceEngine::Entity> cube_2 = startScene->createEntity("cube2");
+    std::shared_ptr<SpaceEngine::Entity> obj = startScene->createEntity("obj");
+
+    std::shared_ptr<SpaceEngine::Transform> cube1Transform = cube_1->addComponent<SpaceEngine::Transform>();
+    std::shared_ptr<SpaceEngine::Transform> cube2Transform = cube_2->addComponent<SpaceEngine::Transform>();
+    std::shared_ptr<SpaceEngine::Transform> objTransform = obj->addComponent<SpaceEngine::Transform>();
+    std::shared_ptr<SpaceEngine::BoxMesh> cube1Mesh = cube_1->addComponent<SpaceEngine::BoxMesh>();
+    std::shared_ptr<SpaceEngine::BoxMesh> cube2Mesh = cube_2->addComponent<SpaceEngine::BoxMesh>();
+
+
+    cube1Transform->setPosition({ 0, 1, 0 });
+    cube2Transform->setPosition({ 2, 0, 0 });
+    cube1Transform->setScale({ 3, 3, 3 });
+    cube2Transform->setScale({ 2, 2, 2 });
+
     core.init();
     core.run();
-    // Window::GetInstance()->CreateGameWindow(L"SpaceEngine", 1080, 720);
-    // Render::Window::GetInstance()->InitializeVariables(1080, 720);
-    /*
-    
-    try
-    {
-        Window Application(hInstance);
-        if (!Application.Initialize())
-            return 0;
-        else
-            return Application.Run();
-    }
-    catch (DxException &e)
-    {
-        MessageBox(nullptr, e.ToString().c_str(), L"Engine Failed Init", MB_OK);
-        return 0;
-    }*/
 }

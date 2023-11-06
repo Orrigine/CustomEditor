@@ -10,5 +10,6 @@
 
 #include "Component/IComponent.hpp"
 #include "Component/Transform.h"
+#include "Component/BoxMesh.h"
 
 #endif /* !COMPONENTS_HPP_ */

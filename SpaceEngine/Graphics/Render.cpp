@@ -1,11 +1,6 @@
 #include <Graphics.h>
 
 const int gNumFrameResources = 3;
-/*
-using namespace Render;
-using namespace DirectX;
-using namespace DirectX::PackedVector;
-using Microsoft::WRL::ComPtr;*/
 
 WCHAR WindowClass[MAX_NAME_STRING] = L"SpaceEngineWindowClass";
 std::shared_ptr<Render::Window> Render::Window::_instance = nullptr;
@@ -90,8 +85,9 @@ bool Render::Window::Initialize()
     /* Compile the VS AND PS shaders -- set the vertex input layout */
     BuildShadersAndInputLayout();
     /* Build all app shapes */
-    buildShape(0, 1, 0, 3, 3, 3, DirectX::Colors::BlueViolet);
-    buildShape(2, 0, 0, 2, 2, 2, DirectX::Colors::BurlyWood);
+    buildGameObjects();
+    ///buildShape(0, 1, 0, 3, 3, 3, DirectX::Colors::BlueViolet);
+    //buildShape(2, 0, 0, 2, 2, 2, DirectX::Colors::BurlyWood);*/
     /* Buils the constant buffers */
     buildGPUBuffers();
     /* Create the three frames ressources with a copy of thr render item */
@@ -170,6 +166,25 @@ void Render::Window::BuildShadersAndInputLayout()
         D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
         { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12,
         D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }, };
+}
+
+void Render::Window::createGameObject(std::string type, const float* color, 
+    float p_x, float p_y, float p_z, float scale_x, float scale_y, 
+    float scale_z)
+{
+    std::shared_ptr<GameObject> gameObject(new GameObject({type, color,
+        p_x, p_y, p_z, scale_x, scale_y, scale_z }));
+    _gameObjects.push_back(gameObject);
+}
+
+void Render::Window::buildGameObjects()
+{
+    for (int i = 0; i < _gameObjects.size(); i++) {
+        buildShape(_gameObjects[i]->p_x, _gameObjects[i]->p_y,
+            _gameObjects[i]->p_z, _gameObjects[i]->scale_x, 
+            _gameObjects[i]->scale_y, _gameObjects[i]->scale_z,
+            _gameObjects[i]->color);
+    }
 }
 
 void Render::Window::buildShape(float p_x, float p_y, float p_z,

@@ -11,6 +11,17 @@
 
 //using namespace DirectX::PackedVector;
 
+struct GameObject {
+    std::string type; 
+    const float* color;
+    float p_x; 
+    float p_y;
+    float p_z;
+    float scale_x;
+    float scale_y;
+    float scale_z;
+};
+
 struct RenderItem
 {   // Lightweight structure stores parameters to draw a shape
     /* The set of data needed to submit a full draw call the rendering pipeline
@@ -82,11 +93,15 @@ namespace Render
         void UpdateMainPassCB(const GameTimer& gt);
         
         void BuildPSOs();
-
+    public:
+        void createGameObject(std::string type, const float* color, float p_x, float p_y, float p_z,
+            float scale_x, float scale_y, float scale_z);
+    private:
         void createShape(std::string submesh, float p_x, float p_y, float p_z,
             float scale_x, float scale_y, float scale_z);
         void buildShape(float p_x, float p_y, float p_z,
             float scale_x, float scale_y, float scale_z, const float* color);
+        void buildGameObjects();
 
         void buildGPUBuffers();
 
@@ -152,6 +167,8 @@ namespace Render
         float mTheta = 1.5f * DirectX::XM_PI;
         float mPhi = 0.2f * DirectX::XM_PI;
         float mRadius = 15.0f;
+
+        std::vector<std::shared_ptr<GameObject>> _gameObjects;
     };
 
 }
