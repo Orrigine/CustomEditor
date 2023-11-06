@@ -104,6 +104,7 @@
     <ClCompile Include="Source\Platform\WIN32\IApp.cpp" />
     <ClCompile Include="Source\SpaceEngine.cpp" />
     <ClCompile Include="Engine\Component\Transform.cpp" />
+    <ClCompile Include="Engine\Component\SphereMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Core.h" />
@@ -133,6 +134,7 @@
     <ClInclude Include="Source\Platform\WIN32\IApp.h" />
     <ClInclude Include="Source\Platform\WIN32\WinEntry.h" />
     <ClInclude Include="Engine\Component\Transform.h" />
+    <ClInclude Include="Engine\Component\SphereMesh.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

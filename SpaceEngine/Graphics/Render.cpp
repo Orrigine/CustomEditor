@@ -13,7 +13,6 @@ _lastGeoVertexOffset(0), _lastGeoVerticesSize(0), _objCBIndex(0)
 
     geo->Name = "shapeGeo";
     _geometries[geo->Name] = std::move(geo);
-
     _wcex = {};
     _instance = nullptr;
 }
@@ -179,15 +178,16 @@ void Render::Window::createGameObject(std::string type, const float* color,
 
 void Render::Window::buildGameObjects()
 {
-    buildShape("box", DirectX::Colors::BurlyWood);
+    buildBox("box", DirectX::Colors::BurlyWood);
+    buildSphere("sphere", DirectX::Colors::Azure);
     for (int i = 0; i < _gameObjects.size(); i++) {
-        createShape("box", _gameObjects[i]->p_x, _gameObjects[i]->p_y,
-            _gameObjects[i]->p_z, _gameObjects[i]->scale_x, 
+        createShape(_gameObjects[i]->type, _gameObjects[i]->p_x, _gameObjects[i]->p_y,
+            _gameObjects[i]->p_z, _gameObjects[i]->scale_x,
             _gameObjects[i]->scale_y, _gameObjects[i]->scale_z);
     }
 }
 
-void Render::Window::buildShape(std::string name, const float* color)
+void Render::Window::buildBox(std::string name, const float* color)
 {
     GeometryGenerator::MeshData newGeo = _geoGen.CreateBox(1.0f, 1.0f,
         1.0f, 3);
@@ -225,7 +225,48 @@ void Render::Window::buildShape(std::string name, const float* color)
     // create vertices and indices upload buffer
     _geometries["shapeGeo"]->DrawArgs[name] = newGeoSubmesh;
    // createShape(std::to_string(_shapesIndices), p_x, p_y, p_z, scale_x, scale_y, scale_z);
-    //_shapesIndices++;
+   _shapesIndices++;
+}
+
+
+void Render::Window::buildSphere(std::string name, const float* color)
+{
+    GeometryGenerator::MeshData newGeo = _geoGen.CreateSphere(1.0f, 20, 20);
+    // We are concatenating all the geometry into one big vertex/index
+    // buffer. So define the regions in the buffer each submesh covers.
+    // Cache the vertex offsets to each object in the concatenated vertex
+    // buffer.
+    UINT newGeoVertexOffset = _lastGeoVertexOffset + _lastGeoVerticesSize;
+    _lastGeoVertexOffset = newGeoVertexOffset;
+    _lastGeoVerticesSize = newGeo.Vertices.size();
+    // Cache the starting index for each object in the concatenated index
+    // buffer.
+    UINT newGeoIndexOffset = _lastGeoIndexOffset + _lastGeoIndicesSize;
+    _lastGeoIndexOffset = newGeoIndexOffset;
+    _lastGeoIndicesSize = (UINT)newGeo.Indices32.size();
+    // Define the SubmeshGeometry that cover different
+    // regions of the vertex/index buffers.
+    SubmeshGeometry newGeoSubmesh;
+    newGeoSubmesh.IndexCount = (UINT)newGeo.Indices32.size();
+    newGeoSubmesh.StartIndexLocation = newGeoIndexOffset;
+    newGeoSubmesh.BaseVertexLocation = newGeoVertexOffset;
+    // Extract the vertex elements we are interested in and pack the
+    // vertices of all the meshes into one vertex buffer.
+    UINT k = _vertices.size();
+    /* Copies each geometry vertex into a big one */
+    _vertices.resize(_vertices.size() + newGeo.Vertices.size());
+    for (size_t i = 0; i < newGeo.Vertices.size(); i++, k++) {
+        _vertices[k].Pos = newGeo.Vertices[i].Position;
+        _vertices[k].Color = DirectX::XMFLOAT4(color);
+    }
+    /* Copies each geometry indices into a big one*/
+    _indices.insert(_indices.end(),
+        std::begin(newGeo.GetIndices16()),
+        std::end(newGeo.GetIndices16()));
+    // create vertices and indices upload buffer
+    _geometries["shapeGeo"]->DrawArgs[name] = newGeoSubmesh;
+    // createShape(std::to_string(_shapesIndices), p_x, p_y, p_z, scale_x, scale_y, scale_z);
+     //_shapesIndices++;
 }
 
 void Render::Window::createShape(std::string submesh, float p_x, float p_y, 

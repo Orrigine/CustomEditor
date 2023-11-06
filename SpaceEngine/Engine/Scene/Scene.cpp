@@ -28,6 +28,7 @@ namespace SpaceEngine {
 	{
 		std::shared_ptr<Entity> entity(new Entity(name, type));
 
+		entity->addComponent<SpaceEngine::Transform>();
 		_entitiesMap[entity->getId()] = entity;
 		return entity;
 	}

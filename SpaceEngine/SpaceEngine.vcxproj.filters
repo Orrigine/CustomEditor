@@ -96,6 +96,9 @@
     <ClCompile Include="Engine\System\RenderSystem.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Component\SphereMesh.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Platform\WIN32\IApp.h">
@@ -177,6 +180,9 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="Engine\System\RenderSystem.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Component\SphereMesh.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>

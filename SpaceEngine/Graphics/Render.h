@@ -101,7 +101,8 @@ namespace Render
             float scale_x, float scale_y, float scale_z);
         //void buildShape(float p_x, float p_y, float p_z,
           //  float scale_x, float scale_y, float scale_z, const float* color);
-        void buildShape(std::string name, const float* color);
+        void buildBox(std::string name, const float* color);
+        void buildSphere(std::string name, const float* color);
         void buildGameObjects();
 
         void buildGPUBuffers();
@@ -124,6 +125,8 @@ namespace Render
         UINT _lastGeoIndexOffset;
         UINT _lastGeoIndicesSize;
         GeometryGenerator _geoGen;
+
+       //std::unordered_map<std::string, GeometryGenerator::MeshData (GeometryGenerator::*) (float width, float height, float depth, GeometryGenerator::uint32 numSubdivisions)> _geometriesMap;
 
         std::vector<Vertex> _vertices;
         std::vector<std::uint16_t> _indices;

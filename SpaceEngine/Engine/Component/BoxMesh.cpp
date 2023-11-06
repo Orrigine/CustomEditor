@@ -10,7 +10,7 @@
 namespace SpaceEngine {
 	std::unordered_map<unsigned int, std::shared_ptr<BoxMesh>> BoxMesh::_entitiesBoxMesh = {};
 
-	BoxMesh::BoxMesh()
+	BoxMesh::BoxMesh() : _meshType("box")
 	{
 	}
 
@@ -27,5 +27,10 @@ namespace SpaceEngine {
 	std::unordered_map<unsigned int, std::shared_ptr<BoxMesh>> BoxMesh::getComponents()
 	{
 		return _entitiesBoxMesh;
+	}
+
+	std::string BoxMesh::getMeshType()
+	{
+		return _meshType;
 	}
 }
