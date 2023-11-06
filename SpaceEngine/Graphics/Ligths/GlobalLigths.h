@@ -7,14 +7,13 @@ class GlobalLigths
 {
 protected:
 	DirectX::XMFLOAT4 color;
-	std::string* filenameShader;
 	float intensity;
 
 public:
-	GlobalLigths(DirectX::XMFLOAT4 color, std::string* filenameShader, float intensity);
+	GlobalLigths();
 	~GlobalLigths();
+	void init(DirectX::XMFLOAT4 newcolor , float newIntencity);
 	void changeColor(DirectX::XMFLOAT4 color);
-	void changeShader(std::string* newFilename);
 	void changeintencity(float newIntencity);
 };
 
