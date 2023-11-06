@@ -79,8 +79,10 @@ bool Render::Window::Initialize()
             - Creer la swap chain
             - Creer les heap des descriptors
     */
-    if (!D3DApp::Initialize())
+    if (!D3DApp::Initialize()) {
+        
         return false;
+    }
     // Reset the command list to prep for initialization commands.
     ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
     /* Create an empty root signature */
