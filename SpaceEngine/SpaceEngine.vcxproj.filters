@@ -15,7 +15,7 @@
     <ClCompile Include="Source\SpaceEngine.cpp" />
     <ClCompile Include="Engine\Component\Transform.cpp" />
     <ClCompile Include="Graphics\ShaderBase.cpp" />
-    <ClCompile Include="Graphics\Ligths\Ligths.cpp" />
+    <ClCompile Include="Graphics\Ligths\GlobalLigths.cpp" />
     <ClCompile Include="Graphics\Ligths\Directional\DirectionalLigths.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -41,7 +41,7 @@
     <ClInclude Include="Source\Platform\WIN32\WinEntry.h" />
     <ClInclude Include="Engine\Component\Transform.h" />
     <ClInclude Include="Graphics\ShaderBase.h" />
-    <ClInclude Include="Graphics\Ligths\Ligths.h" />
+    <ClInclude Include="Graphics\Ligths\GlobalLigths.h" />
     <ClInclude Include="Graphics\Ligths\Directional\DirectionalLigths.h" />
   </ItemGroup>
 </Project>
