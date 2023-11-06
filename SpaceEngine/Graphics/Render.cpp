@@ -179,16 +179,15 @@ void Render::Window::createGameObject(std::string type, const float* color,
 
 void Render::Window::buildGameObjects()
 {
+    buildShape("box", DirectX::Colors::BurlyWood);
     for (int i = 0; i < _gameObjects.size(); i++) {
-        buildShape(_gameObjects[i]->p_x, _gameObjects[i]->p_y,
+        createShape("box", _gameObjects[i]->p_x, _gameObjects[i]->p_y,
             _gameObjects[i]->p_z, _gameObjects[i]->scale_x, 
-            _gameObjects[i]->scale_y, _gameObjects[i]->scale_z,
-            _gameObjects[i]->color);
+            _gameObjects[i]->scale_y, _gameObjects[i]->scale_z);
     }
 }
 
-void Render::Window::buildShape(float p_x, float p_y, float p_z,
-    float scale_x, float scale_y, float scale_z, const float* color)
+void Render::Window::buildShape(std::string name, const float* color)
 {
     GeometryGenerator::MeshData newGeo = _geoGen.CreateBox(1.0f, 1.0f,
         1.0f, 3);
@@ -224,9 +223,9 @@ void Render::Window::buildShape(float p_x, float p_y, float p_z,
         std::begin(newGeo.GetIndices16()),
         std::end(newGeo.GetIndices16()));
     // create vertices and indices upload buffer
-    _geometries["shapeGeo"]->DrawArgs[std::to_string(_shapesIndices)] = newGeoSubmesh;
-    createShape(std::to_string(_shapesIndices), p_x, p_y, p_z, scale_x, scale_y, scale_z);
-    _shapesIndices++;
+    _geometries["shapeGeo"]->DrawArgs[name] = newGeoSubmesh;
+   // createShape(std::to_string(_shapesIndices), p_x, p_y, p_z, scale_x, scale_y, scale_z);
+    //_shapesIndices++;
 }
 
 void Render::Window::createShape(std::string submesh, float p_x, float p_y, 

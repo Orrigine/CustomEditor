@@ -99,8 +99,9 @@ namespace Render
     private:
         void createShape(std::string submesh, float p_x, float p_y, float p_z,
             float scale_x, float scale_y, float scale_z);
-        void buildShape(float p_x, float p_y, float p_z,
-            float scale_x, float scale_y, float scale_z, const float* color);
+        //void buildShape(float p_x, float p_y, float p_z,
+          //  float scale_x, float scale_y, float scale_z, const float* color);
+        void buildShape(std::string name, const float* color);
         void buildGameObjects();
 
         void buildGPUBuffers();
