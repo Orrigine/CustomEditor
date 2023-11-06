@@ -94,7 +94,9 @@
     <ClCompile Include="Common\Source\GameTimer.cpp" />
     <ClCompile Include="Common\Source\GeometryGenerator.cpp" />
     <ClCompile Include="Common\Source\MathHelper.cpp" />
+    <ClCompile Include="Graphics\Ligths\Directional\DirectionalLigths.cpp" />
     <ClCompile Include="Graphics\ShaderBase.cpp" />
+    <ClCompile Include="Graphics\Ligths\Ligths.cpp" />
     <ClCompile Include="Source\Keyboard.cpp" />
     <ClCompile Include="Engine\Entity.cpp" />
     <ClCompile Include="Graphics\Render.cpp" />
@@ -112,6 +114,7 @@
     <ClInclude Include="Common\Headers\GeometryGenerator.h" />
     <ClInclude Include="Common\Headers\MathHelper.h" />
     <ClInclude Include="Common\Headers\UploadBuffer.h" />
+    <ClInclude Include="Graphics\Ligths\Directional\DirectionalLigths.h" />
     <ClInclude Include="Graphics\ShaderBase.h" />
     <ClInclude Include="Headers\Keyboard.h" />
     <ClInclude Include="Engine\Components.hpp" />
@@ -122,6 +125,7 @@
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Graphics\Render.h" />
     <ClInclude Include="Headers\SpaceEngine.h" />
+    <ClInclude Include="Graphics\Ligths\Ligths.h" />
     <ClInclude Include="Source\Platform\WIN32\IApp.h" />
     <ClInclude Include="Source\Platform\WIN32\WinEntry.h" />
     <ClInclude Include="Engine\Component\Transform.h" />
