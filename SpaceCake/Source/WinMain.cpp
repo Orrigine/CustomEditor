@@ -1,29 +1,40 @@
 #include "Headers/pch.h"
 #include "Graphics.h"
 #include <iostream>
-using namespace std;
-using namespace Render;
-#pragma region Global Variables
+#include "Engine.h"
 
+#pragma region Global Variables
 #pragma endregion
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
                    PSTR cmdLine, int showCmd)
 {
-    // Window::GetInstance()->CreateGameWindow(L"SpaceEngine", 1080, 720);
-    // Render::Window::GetInstance()->InitializeVariables(1080, 720);
+    SpaceEngine::Core core(hInstance);
+    std::shared_ptr<SpaceEngine::Scene> startScene = NULL;
 
-    try
-    {
-        Window Application(hInstance);
-        if (!Application.Initialize())
-            return 0;
-        else
-            return Application.Run();
-    }
-    catch (DxException &e)
-    {
-        MessageBox(nullptr, e.ToString().c_str(), L"Engine Failed Init", MB_OK);
-        return 0;
-    }
+    core.createWindow(800, 600, L"SpaceCake");
+    startScene = core.createScene("start");
+    core.setStartScene("start");
+
+    std::shared_ptr<SpaceEngine::Entity> cube_1 = startScene->createEntity("cube1");
+    std::shared_ptr<SpaceEngine::Entity> cube_2 = startScene->createEntity("cube2");
+    std::shared_ptr<SpaceEngine::Entity> obj = startScene->createEntity("obj");
+
+    std::shared_ptr<SpaceEngine::Transform> cube1Transform = cube_1->getComponent<SpaceEngine::Transform>();
+    std::shared_ptr<SpaceEngine::Transform> cube2Transform = cube_2->getComponent<SpaceEngine::Transform>();
+    std::shared_ptr<SpaceEngine::Transform> objTransform = obj->getComponent<SpaceEngine::Transform>();
+    std::shared_ptr<SpaceEngine::BoxMesh> cube1Mesh = cube_1->addComponent<SpaceEngine::BoxMesh>();
+    std::shared_ptr<SpaceEngine::BoxMesh> cube2Mesh = cube_2->addComponent<SpaceEngine::BoxMesh>();
+    std::shared_ptr<SpaceEngine::SphereMesh> sphereMesh = obj->addComponent<SpaceEngine::SphereMesh>();
+
+    cube1Transform->setPosition({ 0, 1, 0 });
+    cube2Transform->setPosition({ 2, 0, 0 });
+    objTransform->setPosition({ - 2 , 0 , -1});
+
+    cube1Transform->setScale({ 3, 3, 3 });
+    cube2Transform->setScale({ 2, 2, 2 });
+    objTransform->setScale({ 2, 2, 2 });
+
+    core.init();
+    core.run();
 }

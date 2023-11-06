@@ -87,6 +87,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Core\Core.cpp" />
+    <ClCompile Include="Engine\Component\BoxMesh.cpp" />
     <ClCompile Include="Common\Source\Camera.cpp" />
     <ClCompile Include="Common\Source\d3dApp.cpp" />
     <ClCompile Include="Common\Source\d3dUtil.cpp" />
@@ -95,12 +97,18 @@
     <ClCompile Include="Common\Source\GeometryGenerator.cpp" />
     <ClCompile Include="Common\Source\MathHelper.cpp" />
     <ClCompile Include="Engine\Entity.cpp" />
+    <ClCompile Include="Engine\Scene\Scene.cpp" />
+    <ClCompile Include="Graphics\FrameResource.cpp" />
     <ClCompile Include="Graphics\Render.cpp" />
+    <ClCompile Include="Engine\System\RenderSystem.cpp" />
     <ClCompile Include="Source\Platform\WIN32\IApp.cpp" />
     <ClCompile Include="Source\SpaceEngine.cpp" />
     <ClCompile Include="Engine\Component\Transform.cpp" />
+    <ClCompile Include="Engine\Component\SphereMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Core\Core.h" />
+    <ClInclude Include="Engine\Component\BoxMesh.h" />
     <ClInclude Include="Common\Headers\Camera.h" />
     <ClInclude Include="Common\Headers\d3dApp.h" />
     <ClInclude Include="Common\Headers\d3dUtil.h" />
@@ -113,14 +121,20 @@
     <ClInclude Include="Engine\Components.hpp" />
     <ClInclude Include="Engine\Component\IComponent.hpp" />
     <ClInclude Include="Engine\Entity.hpp" />
+    <ClInclude Include="Engine\Scene\Scene.hpp" />
     <ClInclude Include="Engine\Systems.hpp" />
+    <ClInclude Include="Engine\System\ISystem.h" />
+    <ClInclude Include="Graphics\FrameResource.h" />
+    <ClInclude Include="Engine.h" />
     <ClInclude Include="Headers\Render.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Graphics\Render.h" />
     <ClInclude Include="Headers\SpaceEngine.h" />
+    <ClInclude Include="Engine\System\RenderSystem.h" />
     <ClInclude Include="Source\Platform\WIN32\IApp.h" />
     <ClInclude Include="Source\Platform\WIN32\WinEntry.h" />
     <ClInclude Include="Engine\Component\Transform.h" />
+    <ClInclude Include="Engine\Component\SphereMesh.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
