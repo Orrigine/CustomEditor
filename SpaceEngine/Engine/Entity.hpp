@@ -15,6 +15,9 @@
 #include <memory>
 #include <unordered_map>
 #include "Component/IComponent.hpp"
+#include "Graphics/Ligths/GlobalLigths.h"
+#include "Graphics/Ligths/Directional/DirectionalLigths.h"
+
 
 namespace SpaceEngine {
     static unsigned int id = 0;
@@ -117,6 +120,13 @@ namespace SpaceEngine {
         {
             return _entitiesMapType[type];
         }
+
+        void putGlobalLight(GlobalLigths* newGlobalLigths) {
+            _globalLigths = newGlobalLigths;
+        }
+        void putDirectionLight(std::list<DirectionalLigths*> newDirectionLigths) {
+            _directionalLigths = newDirectionLigths;
+        }
         
         // Get Scene Returns the Scene of a GameObject given by instance ID.
 
@@ -127,6 +137,9 @@ namespace SpaceEngine {
             std::string _name;
             std::string _type;
             bool _isActive;
+            GlobalLigths* _globalLigths;
+            std::list<DirectionalLigths*> _directionalLigths;
+
             std::vector<std::shared_ptr<IComponent>> _componentsList;
             // It bind a type with all entities of this type
             // When creating a new entity we add it here with his tag

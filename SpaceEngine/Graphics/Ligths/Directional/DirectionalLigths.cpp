@@ -4,7 +4,7 @@ DirectionalLigths::DirectionalLigths(DirectX::XMFLOAT3 position, float intensity
 {
 	this->Position = position;
 	this->intensity = intensity;
-	this->precision = std::max(0.f,std::min(precision,1.f));
+	this->precision = (0.f > (precision<1.f)?precision : 1.f ) ? 0.f : (precision < 1.f) ? precision : 1.f;
 	this->Direction = dir;
 }
 DirectionalLigths ::~DirectionalLigths()
@@ -16,5 +16,5 @@ void DirectionalLigths::changeDirection(DirectX::XMVECTOR newDirection)
 	this->Direction = newDirection;
 }
 void DirectionalLigths::changePrecision(float newPrecisioon) {
-	this->precision = std::max(0.f, std::min(newPrecisioon, 1.f));
+	this->precision = (0.f > (precision < 1.f) ? precision : 1.f) ? 0.f : (precision < 1.f) ? precision : 1.f;
 }
