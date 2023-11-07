@@ -31,6 +31,7 @@ struct RenderItem
     // relative to the world space, which defines the position,
     // orientation, and scale of the object in the world.
     DirectX::XMFLOAT4X4 World = MathHelper::Identity4x4();
+    DirectX::XMFLOAT4X4 TexTransform = MathHelper::Identity4x4();
     // Dirty flag indicating the object data has changed and we need
     // to update the constant buffer. Because we have an object
     // cbuffer for each FrameResource, we have to apply the
@@ -45,10 +46,12 @@ struct RenderItem
     // Geometry associated with this render-item. Note that multiple
     // render-items can share the same geometry.
     MeshGeometry* Geo = nullptr;
+    Material* Mat = nullptr;
     // Primitive topology.
     D3D12_PRIMITIVE_TOPOLOGY PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
     // DrawIndexedInstanced parameters.
     UINT IndexCount = 0;
+
     UINT StartIndexLocation = 0;
     int BaseVertexLocation = 0;
 };
@@ -87,8 +90,15 @@ namespace Render
 
         void BuildRootSignature();
         void BuildShadersAndInputLayout();
+        void BuildMaterials();
+
+        void LoadTextures();
+
+
 
         void BuildFrameResources();
+       // void AnimateMaterials(const GameTimer& gt);
+        void UpdateMaterialsCBs(const GameTimer& gt);
         void UpdateObjectCBs(const GameTimer& gt);
         void UpdateMainPassCB(const GameTimer& gt);
         
@@ -110,12 +120,16 @@ namespace Render
         void BuildConstantBufferViews();
         void DrawRenderItems(ID3D12GraphicsCommandList* cmdList,
             const std::vector<RenderItem*>& ritems);
+        std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> GetStaticSamplers();
 
     private:
         WNDCLASSEX _wcex;
         bool _windowShouldClose;
         int _windowWidth;
         int _windowHeight;
+        int _matCbIndex = 0;
+        int _index = -1;
+
 
         UINT _objCBIndex;
         UINT _shapesIndices;
@@ -123,13 +137,14 @@ namespace Render
         UINT _lastGeoVerticesSize;
         UINT _lastGeoIndexOffset;
         UINT _lastGeoIndicesSize;
+        UINT _cbvSrvDescriptorSize = 0;
         GeometryGenerator _geoGen;
 
         std::vector<Vertex> _vertices;
         std::vector<std::uint16_t> _indices;
 
         Microsoft::WRL::ComPtr<ID3D12RootSignature> _rootSignature = nullptr;
-        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> _cbvHeap = nullptr;
+        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> _srvDescriptorHeap = nullptr;
 
         //std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3DBlob>> _shaders;
         std::vector<D3D12_INPUT_ELEMENT_DESC> _inputLayout;
@@ -160,8 +175,10 @@ namespace Render
 
         std::unordered_map<std::string, std::unique_ptr<MeshGeometry>>
             _geometries;
+        std::unordered_map<std::string, std::unique_ptr<Material>> mMaterials;
+        std::unordered_map<std::string, std::unique_ptr<Texture>> mTextures;
         std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3DBlob>> _shaders;
-        std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> _psos;
+        Microsoft::WRL::ComPtr<ID3D12PipelineState> _psos;
 
         POINT mLastMousePos;
 

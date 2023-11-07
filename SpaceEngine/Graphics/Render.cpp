@@ -78,19 +78,30 @@ bool Render::Window::Initialize()
         
         return false;
     }
+
     // Reset the command list to prep for initialization commands.
     ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
+    _cbvSrvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
     /* Create an empty root signature */
+    LoadTextures();
     BuildRootSignature();
     /* Compile the VS AND PS shaders -- set the vertex input layout */
     BuildShadersAndInputLayout();
     /* Build all app shapes */
+    buildShape("box", DirectX::Colors::BurlyWood);
+    buildGPUBuffers();
+    BuildMaterials();
     buildGameObjects();
+
+
+   
     ///buildShape(0, 1, 0, 3, 3, 3, DirectX::Colors::BlueViolet);
     //buildShape(2, 0, 0, 2, 2, 2, DirectX::Colors::BurlyWood);*/
     /* Buils the constant buffers */
-    buildGPUBuffers();
+   
     /* Create the three frames ressources with a copy of thr render item */
+   
     BuildFrameResources();
     /* Create the constant buffer heap  */
     BuildDescriptorHeaps();
@@ -117,38 +128,41 @@ bool Render::Window::Initialize()
 
 void Render::Window::BuildRootSignature()
 {
-    /* We need to update the root signature to take two descriptor tables:
-    (we need two tables because the CBVs will be set at different frequencies
-        — the per pass CBV only needs to be set once per rendering pass
-        - the per object CBV needs to be set per render item */
-    CD3DX12_DESCRIPTOR_RANGE cbvTable0;
-    cbvTable0.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
-    CD3DX12_DESCRIPTOR_RANGE cbvTable1;
-    cbvTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
+    CD3DX12_DESCRIPTOR_RANGE texTable;
+    texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 
     // Root parameter can be a table, root descriptor or root constants.
-    CD3DX12_ROOT_PARAMETER slotRootParameter[2];
-    // Create root CBVs.
-    slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable0);
-    slotRootParameter[1].InitAsDescriptorTable(1, &cbvTable1);
+    CD3DX12_ROOT_PARAMETER slotRootParameter[4];
+
+    // Perfomance TIP: Order from most frequent to least frequent.
+    slotRootParameter[0].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_PIXEL);
+    slotRootParameter[1].InitAsConstantBufferView(0);
+    slotRootParameter[2].InitAsConstantBufferView(1);
+    slotRootParameter[3].InitAsConstantBufferView(2);
+
+    auto staticSamplers = GetStaticSamplers();
 
     // A root signature is an array of root parameters.
-    CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, slotRootParameter, 0, nullptr,
+    CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(4, slotRootParameter,
+        (UINT)staticSamplers.size(), staticSamplers.data(),
         D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
-    // create a root signature with a single slot which points to a 
-    // descriptor range consisting of a single constant buffer
+    // create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
     Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSig = nullptr;
     Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
-    HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc,
-        D3D_ROOT_SIGNATURE_VERSION_1, serializedRootSig.GetAddressOf(),
-        errorBlob.GetAddressOf());
+    HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+        serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
 
     if (errorBlob != nullptr)
+    {
         ::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+    }
     ThrowIfFailed(hr);
-    ThrowIfFailed(md3dDevice->CreateRootSignature(0,
-        serializedRootSig->GetBufferPointer(), serializedRootSig->GetBufferSize(),
+
+    ThrowIfFailed(md3dDevice->CreateRootSignature(
+        0,
+        serializedRootSig->GetBufferPointer(),
+        serializedRootSig->GetBufferSize(),
         IID_PPV_ARGS(_rootSignature.GetAddressOf())));
 }
 
@@ -161,11 +175,13 @@ void Render::Window::BuildShadersAndInputLayout()
     /*    ####  DEFINE THE VERTEX INPUT LAYOUT   ####    */
     /* An imput layout contain the description of each element
         in a vertex structure */
-    _inputLayout = {
-        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
-        D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12,
-        D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }, };
+    _inputLayout =
+    {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+    };
 }
 
 void Render::Window::createGameObject(std::string type, const float* color, 
@@ -179,8 +195,9 @@ void Render::Window::createGameObject(std::string type, const float* color,
 
 void Render::Window::buildGameObjects()
 {
-    buildShape("box", DirectX::Colors::BurlyWood);
+   
     for (int i = 0; i < _gameObjects.size(); i++) {
+
         createShape("box", _gameObjects[i]->p_x, _gameObjects[i]->p_y,
             _gameObjects[i]->p_z, _gameObjects[i]->scale_x, 
             _gameObjects[i]->scale_y, _gameObjects[i]->scale_z);
@@ -216,7 +233,9 @@ void Render::Window::buildShape(std::string name, const float* color)
     _vertices.resize(_vertices.size() + newGeo.Vertices.size());
     for (size_t i = 0; i < newGeo.Vertices.size(); i++, k++) {
         _vertices[k].Pos = newGeo.Vertices[i].Position;
+        _vertices[k].Normal = newGeo.Vertices[i].Normal;
         _vertices[k].Color = DirectX::XMFLOAT4(color);
+        _vertices[k].TexC = newGeo.Vertices[i].TexC;
     }
     /* Copies each geometry indices into a big one*/
     _indices.insert(_indices.end(),
@@ -231,25 +250,19 @@ void Render::Window::buildShape(std::string name, const float* color)
 void Render::Window::createShape(std::string submesh, float p_x, float p_y, 
     float p_z, float scale_x, float scale_y, float scale_z)
 {
-    /* Create the render item */
-    auto newRenderItem = std::make_unique<RenderItem>();
-    /* set up its position */
-    DirectX::XMMATRIX world =
-        DirectX::XMMatrixTranslation(p_x, p_y, p_z)
-        * DirectX::XMMatrixScaling(scale_x, scale_y, scale_z);
-    DirectX::XMStoreFloat4x4(&newRenderItem->World, world);
-    newRenderItem->ObjCBIndex = _objCBIndex++;
-    newRenderItem->Geo = _geometries["shapeGeo"].get();
-    newRenderItem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-    newRenderItem->IndexCount = newRenderItem->Geo->DrawArgs[submesh].
-        IndexCount;
-    newRenderItem->StartIndexLocation =
-        newRenderItem->Geo->DrawArgs[submesh].StartIndexLocation;
-    newRenderItem->BaseVertexLocation =
-        newRenderItem->Geo->DrawArgs[submesh].BaseVertexLocation;
-    _opaqueRenderItems.push_back(newRenderItem.get());
-    /* add the render item to the render items vect */
-    _allRenderItems.push_back(std::move(newRenderItem));
+    auto boxRitem = std::make_unique<RenderItem>();
+    boxRitem->ObjCBIndex = _objCBIndex++;
+    boxRitem->Mat = mMaterials["woodCrate"].get();
+    boxRitem->Geo = _geometries["shapeGeo"].get();
+    boxRitem->PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    boxRitem->IndexCount = boxRitem->Geo->DrawArgs[submesh].IndexCount;
+    boxRitem->StartIndexLocation = boxRitem->Geo->DrawArgs[submesh].StartIndexLocation;
+    boxRitem->BaseVertexLocation = boxRitem->Geo->DrawArgs[submesh].BaseVertexLocation;
+    _allRenderItems.push_back(std::move(boxRitem));
+
+    // All the render items are opaque.
+    for (auto& e : _allRenderItems)
+        _opaqueRenderItems.push_back(e.get());
 }
 
 void Render::Window::buildGPUBuffers()
@@ -260,46 +273,69 @@ void Render::Window::buildGPUBuffers()
     //auto geo = std::make_unique<MeshGeometry>();
 
     //geo->Name = "shapeGeo";
-    ThrowIfFailed(D3DCreateBlob(vbByteSize, &_geometries["shapeGeo"]->VertexBufferCPU));
-    CopyMemory(_geometries["shapeGeo"]->VertexBufferCPU->GetBufferPointer(),
-        _vertices.data(), vbByteSize);
-    ThrowIfFailed(D3DCreateBlob(ibByteSize, &_geometries["shapeGeo"]->IndexBufferCPU));
-    CopyMemory(_geometries["shapeGeo"]->IndexBufferCPU->GetBufferPointer(), _indices.data(),
-        ibByteSize);
+
+	ThrowIfFailed(D3DCreateBlob(vbByteSize, &_geometries["shapeGeo"]->VertexBufferCPU));
+	CopyMemory(_geometries["shapeGeo"]->VertexBufferCPU->GetBufferPointer(), _vertices.data(), vbByteSize);
+
+	ThrowIfFailed(D3DCreateBlob(ibByteSize, &_geometries["shapeGeo"]->IndexBufferCPU));
+	CopyMemory(_geometries["shapeGeo"]->IndexBufferCPU->GetBufferPointer(), _indices.data(), ibByteSize);
+
     _geometries["shapeGeo"]->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(),
-        mCommandList.Get(), _vertices.data(), vbByteSize, _geometries["shapeGeo"]->VertexBufferUploader);
+		mCommandList.Get(), _vertices.data(), vbByteSize, _geometries["shapeGeo"]->VertexBufferUploader);
+
     _geometries["shapeGeo"]->IndexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(),
-        mCommandList.Get(), _indices.data(), ibByteSize, _geometries["shapeGeo"]->IndexBufferUploader);
+		mCommandList.Get(), _indices.data(), ibByteSize,  _geometries["shapeGeo"]->IndexBufferUploader);
 
     _geometries["shapeGeo"]->VertexByteStride = sizeof(Vertex);
     _geometries["shapeGeo"]->VertexBufferByteSize = vbByteSize;
     _geometries["shapeGeo"]->IndexFormat = DXGI_FORMAT_R16_UINT;
     _geometries["shapeGeo"]->IndexBufferByteSize = ibByteSize;
 }
+void Render::Window::BuildMaterials()
+{
+    auto woodCrate = std::make_unique<Material>();
+    woodCrate->Name = "woodCrate";
+    woodCrate->MatCBIndex = 0;
+    woodCrate->DiffuseSrvHeapIndex = 0;
+    woodCrate->DiffuseAlbedo = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+    woodCrate->FresnelR0 = DirectX::XMFLOAT3(0.05f, 0.05f, 0.05f);
+    woodCrate->Roughness = 0.2f;
 
+    mMaterials[woodCrate->Name] = std::move(woodCrate);
+}
 void Render::Window::BuildFrameResources()
 {
-    for (int i = 0; i < gNumFrameResources; i++) {
-        _frameResources.push_back(std::make_unique<FrameResources>(
-            md3dDevice.Get(), 1, (UINT)_allRenderItems.size()));
+    for(int i = 0; i < gNumFrameResources; ++i)
+    {
+        _frameResources.push_back(std::make_unique<FrameResources>(md3dDevice.Get(),
+            1, (UINT)_allRenderItems.size(), (UINT)mMaterials.size()));
     }
 }
 
 void Render::Window::BuildDescriptorHeaps()
 {
-    UINT objCount = (UINT)_opaqueRenderItems.size();
-    // Need a CBV descriptor for each object for each frame resource,
-    // +1 for the perPass CBV for each frame resource.
-    UINT numDescriptors = (objCount + 1) * gNumFrameResources;
-    // Save an offset to the start of the pass CBVs. These are the last descriptors.
-    _passCbvOffset = objCount * gNumFrameResources;
-    D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc = {};
-    cbvHeapDesc.NumDescriptors = numDescriptors;
-    cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    cbvHeapDesc.NodeMask = 0;
-    ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&cbvHeapDesc,
-        IID_PPV_ARGS(&_cbvHeap)));
+    D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
+    srvHeapDesc.NumDescriptors = 100;
+    srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+    srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+    ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&_srvDescriptorHeap)));
+
+    //
+    // Fill out the heap with actual descriptors.
+    //
+    CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(_srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+    auto woodCrateTex = mTextures["woodCrateTex"]->Resource;
+
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc.Format = woodCrateTex->GetDesc().Format;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    srvDesc.Texture2D.MipLevels = woodCrateTex->GetDesc().MipLevels;
+    srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+
+    md3dDevice->CreateShaderResourceView(woodCrateTex.Get(), &srvDesc, hDescriptor);
+
 }
 
 void Render::Window::BuildConstantBufferViews()
@@ -313,21 +349,6 @@ void Render::Window::BuildConstantBufferViews()
         for (UINT i = 0; i < objCount; ++i) {
             D3D12_GPU_VIRTUAL_ADDRESS cbAddress =
                 objectCB->GetGPUVirtualAddress();
-            // Offset to the ith object constant buffer heap 
-            // in the current buffer.
-            cbAddress += i * objCBByteSize;
-            // Offset to the object CBV in the descriptor heap.
-            int heapIndex = frameIndex * objCount + i;
-            /* Once we know the descriptor increment size,
-            we can use one of the two CD3DX12_CPU_DESCRIPTOR_HANDLE::Offset
-            methods to offset the handle by n descriptors: */
-            auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(
-                _cbvHeap->GetCPUDescriptorHandleForHeapStart());
-            handle.Offset(heapIndex, mCbvSrvUavDescriptorSize);
-            D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-            cbvDesc.BufferLocation = cbAddress;
-            cbvDesc.SizeInBytes = objCBByteSize;
-            md3dDevice->CreateConstantBufferView(&cbvDesc, handle);
         }
     }
     UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof
@@ -335,17 +356,6 @@ void Render::Window::BuildConstantBufferViews()
     // Last three descriptors are the pass CBVs for each frame resource.
     for (int frameIndex = 0; frameIndex < gNumFrameResources; frameIndex++) {
         auto passCB = _frameResources[frameIndex]->PassCB->Resource();
-        // Pass buffer only stores one cbuffer per frame resource.
-        D3D12_GPU_VIRTUAL_ADDRESS cbAddress = passCB->GetGPUVirtualAddress();
-        // Offset to the pass cbv in the descriptor heap.
-        int heapIndex = _passCbvOffset + frameIndex;
-        auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(
-            _cbvHeap->GetCPUDescriptorHandleForHeapStart());
-        handle.Offset(heapIndex, mCbvSrvUavDescriptorSize);
-        D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-        cbvDesc.BufferLocation = cbAddress;
-        cbvDesc.SizeInBytes = passCBByteSize;
-        md3dDevice->CreateConstantBufferView(&cbvDesc, handle);
     }
 }
 
@@ -353,17 +363,24 @@ void Render::Window::BuildPSOs()
 {
     /*		####	PSO FOR OPAQUE OBJECTS		####	 */
     D3D12_GRAPHICS_PIPELINE_STATE_DESC opaquePsoDesc;
+
+    //
+    // PSO for opaque objects.
+    //
     ZeroMemory(&opaquePsoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
     opaquePsoDesc.InputLayout = { _inputLayout.data(), (UINT)_inputLayout.size() };
     opaquePsoDesc.pRootSignature = _rootSignature.Get();
-    opaquePsoDesc.VS = {
+    opaquePsoDesc.VS =
+    {
         reinterpret_cast<BYTE*>(_shaders["standardVS"]->GetBufferPointer()),
-        _shaders["standardVS"]->GetBufferSize() };
-    opaquePsoDesc.PS = {
+        _shaders["standardVS"]->GetBufferSize()
+    };
+    opaquePsoDesc.PS =
+    {
         reinterpret_cast<BYTE*>(_shaders["opaquePS"]->GetBufferPointer()),
-        _shaders["opaquePS"]->GetBufferSize() };
+        _shaders["opaquePS"]->GetBufferSize()
+    };
     opaquePsoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-    opaquePsoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
     opaquePsoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     opaquePsoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
     opaquePsoDesc.SampleMask = UINT_MAX;
@@ -373,16 +390,28 @@ void Render::Window::BuildPSOs()
     opaquePsoDesc.SampleDesc.Count = m4xMsaaState ? 4 : 1;
     opaquePsoDesc.SampleDesc.Quality = m4xMsaaState ? (m4xMsaaQuality - 1) : 0;
     opaquePsoDesc.DSVFormat = mDepthStencilFormat;
-    ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(
-        &opaquePsoDesc, IID_PPV_ARGS(&_psos["opaque"])));
+    ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&opaquePsoDesc, IID_PPV_ARGS(&_psos)));
 
-    /*		####	PSO FOR OPAQUE WIREFRAME OBJECTS		####	 */
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC opaqueWireframePsoDesc = opaquePsoDesc;
-    opaqueWireframePsoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
-    ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(
-        &opaqueWireframePsoDesc, IID_PPV_ARGS(&_psos["opaque_wireframe"])));
+
+
+    ///*		####	PSO FOR OPAQUE WIREFRAME OBJECTS		####	 */
+    //D3D12_GRAPHICS_PIPELINE_STATE_DESC opaqueWireframePsoDesc = opaquePsoDesc;
+    //opaqueWireframePsoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+    //ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(
+    //    &opaqueWireframePsoDesc, IID_PPV_ARGS(&_psos)));
 }
 
+void Render::Window::LoadTextures()
+{
+    auto woodCrateTex = std::make_unique<Texture>();
+    woodCrateTex->Name = "woodCrateTex";
+    woodCrateTex->Filename = L"../Textures/WoodCrate01.dds";
+    ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(md3dDevice.Get(),
+        mCommandList.Get(), woodCrateTex->Filename.c_str(),
+        woodCrateTex->Resource, woodCrateTex->UploadHeap));
+
+    mTextures[woodCrateTex->Name] = std::move(woodCrateTex);
+}
 void Render::Window::Update(const GameTimer& gt)
 {
     OnKeyboardInput(gt);
@@ -404,9 +433,36 @@ void Render::Window::Update(const GameTimer& gt)
     }
     // [...] Update resources in mCurrFrameResource (like cbuffers).
     UpdateObjectCBs(gt);
+    UpdateMaterialsCBs(gt);
     UpdateMainPassCB(gt);
 }
 
+
+void Render::Window::UpdateMaterialsCBs(const GameTimer& gt)
+{
+    auto currMaterialCB = _currFrameResource->MaterialCB.get();
+    for (auto& e : mMaterials)
+    {
+        // Only update the cbuffer data if the constants have changed.  If the cbuffer
+        // data changes, it needs to be updated for each FrameResource.
+        Material* mat = e.second.get();
+        if (mat->NumFramesDirty > 0)
+        {
+                DirectX::XMMATRIX matTransform = XMLoadFloat4x4(&mat->MatTransform);
+
+            MaterialConstants matConstants;
+            matConstants.DiffuseAlbedo = mat->DiffuseAlbedo;
+            matConstants.FresnelR0 = mat->FresnelR0;
+            matConstants.Roughness = mat->Roughness;
+            XMStoreFloat4x4(&matConstants.MatTransform, XMMatrixTranspose(matTransform));
+
+            currMaterialCB->CopyData(mat->MatCBIndex, matConstants);
+
+            // Next FrameResource need to be updated too.
+            mat->NumFramesDirty--;
+        }
+    }
+}
 void Render::Window::UpdateObjectCBs(const GameTimer& gt)
 {
     auto currObjectCB = _currFrameResource->ObjectCB.get();
@@ -461,92 +517,94 @@ void Render::Window::UpdateMainPassCB(const GameTimer& gt)
 void Render::Window::DrawRenderItems(ID3D12GraphicsCommandList* cmdList,
     const std::vector<RenderItem*>& ritems)
 {
-    UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(
-        sizeof(ObjectConstants));
+
+
+    UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
+    UINT matCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(MaterialConstants));
+
     auto objectCB = _currFrameResource->ObjectCB->Resource();
+    auto matCB = _currFrameResource->MaterialCB->Resource();
 
     // For each render item...
-    for (size_t i = 0; i < ritems.size(); ++i) {
+    for (size_t i = 0; i < ritems.size(); ++i)
+    {
         auto ri = ritems[i];
+
         cmdList->IASetVertexBuffers(0, 1, &ri->Geo->VertexBufferView());
         cmdList->IASetIndexBuffer(&ri->Geo->IndexBufferView());
         cmdList->IASetPrimitiveTopology(ri->PrimitiveType);
-        // Offset to the CBV in the descriptor heap for this object and
-        // for this frame resource.
-        UINT cbvIndex = _currFrameResourceIndex *
-            (UINT)_opaqueRenderItems.size() + ri->ObjCBIndex;
-        auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(
-            _cbvHeap->GetGPUDescriptorHandleForHeapStart());
-        cbvHandle.Offset(cbvIndex, mCbvSrvUavDescriptorSize);
-        cmdList->SetGraphicsRootDescriptorTable(0, cbvHandle);
-        cmdList->DrawIndexedInstanced(ri->IndexCount, 1,
-            ri->StartIndexLocation, ri->BaseVertexLocation, 0);
+
+        CD3DX12_GPU_DESCRIPTOR_HANDLE tex(_srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+        tex.Offset(ri->Mat->DiffuseSrvHeapIndex, _cbvSrvDescriptorSize);
+
+        D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = objectCB->GetGPUVirtualAddress() + ri->ObjCBIndex * objCBByteSize;
+        D3D12_GPU_VIRTUAL_ADDRESS matCBAddress = matCB->GetGPUVirtualAddress() + ri->Mat->MatCBIndex * matCBByteSize;
+
+        cmdList->SetGraphicsRootDescriptorTable(0, tex);
+        cmdList->SetGraphicsRootConstantBufferView(1, objCBAddress);
+        cmdList->SetGraphicsRootConstantBufferView(3, matCBAddress);
+
+        cmdList->DrawIndexedInstanced(ri->IndexCount, 1, ri->StartIndexLocation, ri->BaseVertexLocation, 0);
     }
 }
 
 void Render::Window::Draw(const GameTimer& gt)
 {
     auto cmdListAlloc = _currFrameResource->CmdListAlloc;
+
     // Reuse the memory associated with command recording.
-    // We can only reset when the associated command lists have
-    // finished execution on the GPU.
+    // We can only reset when the associated command lists have finished execution on the GPU.
     ThrowIfFailed(cmdListAlloc->Reset());
-    // A command list can be reset after it has been added to the
-    // command queue via ExecuteCommandList.
+
+    // A command list can be reset after it has been added to the command queue via ExecuteCommandList.
     // Reusing the command list reuses memory.
-    if (_isWireframe) {
-        ThrowIfFailed(mCommandList->Reset(
-            cmdListAlloc.Get(), _psos["opaque_wireframe"].Get()));
-    }
-    else {
-        ThrowIfFailed(mCommandList->Reset(cmdListAlloc.Get(),
-            _psos["opaque"].Get()));
-    }
+    ThrowIfFailed(mCommandList->Reset(cmdListAlloc.Get(), _psos.Get()));
+
     mCommandList->RSSetViewports(1, &mScreenViewport);
     mCommandList->RSSetScissorRects(1, &mScissorRect);
+
     // Indicate a state transition on the resource usage.
-    mCommandList->ResourceBarrier(1,
-        &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
-            D3D12_RESOURCE_STATE_PRESENT,
-            D3D12_RESOURCE_STATE_RENDER_TARGET));
+    mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+        D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+
     // Clear the back buffer and depth buffer.
-    mCommandList->ClearRenderTargetView(CurrentBackBufferView(),
-        DirectX::Colors::LightSteelBlue, 0, nullptr);
-    mCommandList->ClearDepthStencilView(DepthStencilView(),
-        D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
-        1.0f, 0, 0, nullptr);
+    mCommandList->ClearRenderTargetView(CurrentBackBufferView(), DirectX::Colors::LightSteelBlue, 0, nullptr);
+    mCommandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+
     // Specify the buffers we are going to render to.
-    mCommandList->OMSetRenderTargets(1, &CurrentBackBufferView(),
-        true, &DepthStencilView());
-    ID3D12DescriptorHeap* descriptorHeaps[] = { _cbvHeap.Get() };
-    mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps),
-        descriptorHeaps);
+    mCommandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
+
+    ID3D12DescriptorHeap* descriptorHeaps[] = { _srvDescriptorHeap.Get() };
+    mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+
     mCommandList->SetGraphicsRootSignature(_rootSignature.Get());
-    int passCbvIndex = _passCbvOffset + _currFrameResourceIndex;
-    auto passCbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(
-        _cbvHeap->GetGPUDescriptorHandleForHeapStart());
-    passCbvHandle.Offset(passCbvIndex, mCbvSrvUavDescriptorSize);
-    mCommandList->SetGraphicsRootDescriptorTable(1, passCbvHandle);
+
+    auto passCB = _currFrameResource->PassCB->Resource();
+    mCommandList->SetGraphicsRootConstantBufferView(2, passCB->GetGPUVirtualAddress());
+
     DrawRenderItems(mCommandList.Get(), _opaqueRenderItems);
+
     // Indicate a state transition on the resource usage.
-    mCommandList->ResourceBarrier(1,
-        &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
-            D3D12_RESOURCE_STATE_RENDER_TARGET,
-            D3D12_RESOURCE_STATE_PRESENT));
+    mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+        D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+
     // Done recording commands.
     ThrowIfFailed(mCommandList->Close());
+
     // Add the command list to the queue for execution.
     ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
     mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+
     // Swap the back and front buffers
     ThrowIfFailed(mSwapChain->Present(0, 0));
     mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
+
     // Advance the fence value to mark commands up to this fence point.
     _currFrameResource->Fence = ++mCurrentFence;
-    // Add an instruction to the command queue to set a new fence point.
-    // Because we are on the GPU timeline, the new fence point won’t be
-    // set until the GPU finishes processing all the commands prior to 
-    // this Signal().
+
+    // Add an instruction to the command queue to set a new fence point. 
+    // Because we are on the GPU timeline, the new fence point won't be 
+    // set until the GPU finishes processing all the commands prior to this Signal().
     mCommandQueue->Signal(mFence.Get(), mCurrentFence);
 }
 
@@ -665,4 +723,61 @@ std::shared_ptr<Render::Window> Render::Window::GetInstance()
         _instance = ptr;
     }
     return _instance;
+}
+
+
+
+std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> Render::Window::GetStaticSamplers()
+{
+
+    const CD3DX12_STATIC_SAMPLER_DESC pointWrap(
+        0, // shaderRegister
+        D3D12_FILTER_MIN_MAG_MIP_POINT, // filter
+        D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressU
+        D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressV
+        D3D12_TEXTURE_ADDRESS_MODE_WRAP); // addressW
+
+    const CD3DX12_STATIC_SAMPLER_DESC pointClamp(
+        1, // shaderRegister
+        D3D12_FILTER_MIN_MAG_MIP_POINT, // filter
+        D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressU
+        D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressV
+        D3D12_TEXTURE_ADDRESS_MODE_CLAMP); // addressW
+
+    const CD3DX12_STATIC_SAMPLER_DESC linearWrap(
+        2, // shaderRegister
+        D3D12_FILTER_MIN_MAG_MIP_LINEAR, // filter
+        D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressU
+        D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressV
+        D3D12_TEXTURE_ADDRESS_MODE_WRAP); // addressW
+
+    const CD3DX12_STATIC_SAMPLER_DESC linearClamp(
+        3, // shaderRegister
+        D3D12_FILTER_MIN_MAG_MIP_LINEAR, // filter
+        D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressU
+        D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressV
+        D3D12_TEXTURE_ADDRESS_MODE_CLAMP); // addressW
+
+    const CD3DX12_STATIC_SAMPLER_DESC anisotropicWrap(
+        4, // shaderRegister
+        D3D12_FILTER_ANISOTROPIC, // filter
+        D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressU
+        D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressV
+        D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressW
+        0.0f,                             // mipLODBias
+        8);                               // maxAnisotropy
+
+    const CD3DX12_STATIC_SAMPLER_DESC anisotropicClamp(
+        5, // shaderRegister
+        D3D12_FILTER_ANISOTROPIC, // filter
+        D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressU
+        D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressV
+        D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressW
+        0.0f,                              // mipLODBias
+        8);                                // maxAnisotropy
+
+    return {
+        pointWrap, pointClamp,
+        linearWrap, linearClamp,
+        anisotropicWrap, anisotropicClamp };
 }
