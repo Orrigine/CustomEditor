@@ -16,5 +16,5 @@ namespace SpaceEngine {
     {
         std::wstring res(mess.begin(), mess.end());
         OutputDebugStringW(res.c_str());
-    }
+    }   
 }

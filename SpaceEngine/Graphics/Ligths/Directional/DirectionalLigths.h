@@ -14,5 +14,6 @@ public:
 	~DirectionalLigths ();
 	void changeDirection(DirectX::XMVECTOR newDirection);
 	void changePrecision(float newprecision);
+	DirectX::XMFLOAT3 getPosition();
 };
 

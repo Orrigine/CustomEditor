@@ -18,3 +18,10 @@ void DirectionalLigths::changeDirection(DirectX::XMVECTOR newDirection)
 void DirectionalLigths::changePrecision(float newPrecisioon) {
 	this->precision = (0.f > (precision < 1.f) ? precision : 1.f) ? 0.f : (precision < 1.f) ? precision : 1.f;
 }
+
+DirectX::XMFLOAT3 DirectionalLigths::getPosition()
+{
+	return this->Position;
+}
+
+

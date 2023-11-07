@@ -15,5 +15,6 @@ public:
 	void init(DirectX::XMFLOAT4 newcolor , float newIntencity);
 	void changeColor(DirectX::XMFLOAT4 color);
 	void changeintencity(float newIntencity);
+	float getIntensity();
 };
 

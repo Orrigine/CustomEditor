@@ -20,3 +20,8 @@ void GlobalLigths::changeintencity(float newIntencity)
 	this->intensity = newIntencity;
 }
 
+float GlobalLigths::getIntensity()
+{
+	return this->intensity;
+}
+

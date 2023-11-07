@@ -17,6 +17,7 @@
 #include "Component/IComponent.hpp"
 #include "Graphics/Ligths/GlobalLigths.h"
 #include "Graphics/Ligths/Directional/DirectionalLigths.h"
+#include "Component/Transform.cpp"
 
 
 namespace SpaceEngine {
@@ -127,6 +128,13 @@ namespace SpaceEngine {
         void putDirectionLight(std::list<DirectionalLigths*> newDirectionLigths) {
             _directionalLigths = newDirectionLigths;
         }
+
+        float calculIntensityLight(DirectionalLigths* dir) {
+             Vector3f  a =SpaceEngine::Transform::getComponents()[this->_id].get()->getPosition();
+             DirectX::XMFLOAT3 b = dir->getPosition();
+             return (std::sqrt((float)std::pow(a.x + b.x, 2) + (float)std::pow(a.y + b.y, 2) + (float)std::pow(a.z + b.z, 2)) > dir->getIntensity()) ? 0 : std::sqrt(std::pow(a.x + b.x, 2) + std::pow(a.y + b.y, 2) + std::pow(a.z + b.z, 2)) / dir->getIntensity();
+
+        };
         
         // Get Scene Returns the Scene of a GameObject given by instance ID.
 
