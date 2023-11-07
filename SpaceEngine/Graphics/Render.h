@@ -12,9 +12,9 @@
 //using namespace DirectX::PackedVector;
 
 struct GameObject {
-    std::string type; 
+    std::string type;
     const float* color;
-    float p_x; 
+    float p_x;
     float p_y;
     float p_z;
     float scale_x;
@@ -91,7 +91,7 @@ namespace Render
         void BuildFrameResources();
         void UpdateObjectCBs(const GameTimer& gt);
         void UpdateMainPassCB(const GameTimer& gt);
-        
+
         void BuildPSOs();
     public:
         void createGameObject(std::string type, const float* color, float p_x, float p_y, float p_z,
@@ -126,7 +126,7 @@ namespace Render
         UINT _lastGeoIndicesSize;
         GeometryGenerator _geoGen;
 
-       //std::unordered_map<std::string, GeometryGenerator::MeshData (GeometryGenerator::*) (float width, float height, float depth, GeometryGenerator::uint32 numSubdivisions)> _geometriesMap;
+        //std::unordered_map<std::string, GeometryGenerator::MeshData (GeometryGenerator::*) (float width, float height, float depth, GeometryGenerator::uint32 numSubdivisions)> _geometriesMap;
 
         std::vector<Vertex> _vertices;
         std::vector<std::uint16_t> _indices;
@@ -136,13 +136,6 @@ namespace Render
 
         //std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3DBlob>> _shaders;
         std::vector<D3D12_INPUT_ELEMENT_DESC> _inputLayout;
-
-
-        // FRAME RESSOURCES
-        static const int _numFrameResources = 3;
-        std::vector<std::unique_ptr<FrameResources>> _frameResources;
-        FrameResources* _currFrameResource = nullptr;
-        int _currFrameResourceIndex = 0;
 
         // List of all the render items.
         std::vector<std::unique_ptr<RenderItem>> _allRenderItems;
@@ -173,6 +166,14 @@ namespace Render
         float mRadius = 15.0f;
 
         std::vector<std::shared_ptr<GameObject>> _gameObjects;
+
+
+        Microsoft::WRL::ComPtr<ID3D12CommandAllocator> cmdListAlloc;
+
+        // We cannot update a cbuffer until the GPU is done processing the
+        // commands that reference it. So each frame needs their own cbuffers.
+        std::unique_ptr<UploadBuffer<PassConstants>> PassCB = nullptr;
+        std::unique_ptr<UploadBuffer<ObjectConstants>> ObjectCB = nullptr;
     };
 
 }

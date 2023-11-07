@@ -1,12 +1,11 @@
 #include <Graphics.h>
 
-const int gNumFrameResources = 3;
 
 WCHAR WindowClass[MAX_NAME_STRING] = L"SpaceEngineWindowClass";
 std::shared_ptr<Render::Window> Render::Window::_instance = nullptr;
 
 Render::Window::Window(HINSTANCE hInstance) : D3DApp(hInstance),
-_shapesIndices(1), _lastGeoIndexOffset(0), _lastGeoIndicesSize(0), 
+_shapesIndices(1), _lastGeoIndexOffset(0), _lastGeoIndicesSize(0),
 _lastGeoVertexOffset(0), _lastGeoVerticesSize(0), _objCBIndex(0)
 {
     auto geo = std::make_unique<MeshGeometry>();
@@ -74,7 +73,7 @@ bool Render::Window::Initialize()
             - Creer les heap des descriptors
     */
     if (!D3DApp::Initialize()) {
-        
+
         return false;
     }
     // Reset the command list to prep for initialization commands.
@@ -167,11 +166,11 @@ void Render::Window::BuildShadersAndInputLayout()
         D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }, };
 }
 
-void Render::Window::createGameObject(std::string type, const float* color, 
-    float p_x, float p_y, float p_z, float scale_x, float scale_y, 
+void Render::Window::createGameObject(std::string type, const float* color,
+    float p_x, float p_y, float p_z, float scale_x, float scale_y,
     float scale_z)
 {
-    std::shared_ptr<GameObject> gameObject(new GameObject({type, color,
+    std::shared_ptr<GameObject> gameObject(new GameObject({ type, color,
         p_x, p_y, p_z, scale_x, scale_y, scale_z }));
     _gameObjects.push_back(gameObject);
 }
@@ -224,8 +223,8 @@ void Render::Window::buildBox(std::string name, const float* color)
         std::end(newGeo.GetIndices16()));
     // create vertices and indices upload buffer
     _geometries["shapeGeo"]->DrawArgs[name] = newGeoSubmesh;
-   // createShape(std::to_string(_shapesIndices), p_x, p_y, p_z, scale_x, scale_y, scale_z);
-   _shapesIndices++;
+    // createShape(std::to_string(_shapesIndices), p_x, p_y, p_z, scale_x, scale_y, scale_z);
+    _shapesIndices++;
 }
 
 
@@ -269,7 +268,7 @@ void Render::Window::buildSphere(std::string name, const float* color)
      //_shapesIndices++;
 }
 
-void Render::Window::createShape(std::string submesh, float p_x, float p_y, 
+void Render::Window::createShape(std::string submesh, float p_x, float p_y,
     float p_z, float scale_x, float scale_y, float scale_z)
 {
     /* Create the render item */
@@ -320,10 +319,20 @@ void Render::Window::buildGPUBuffers()
 
 void Render::Window::BuildFrameResources()
 {
-    for (int i = 0; i < gNumFrameResources; i++) {
+    ThrowIfFailed((md3dDevice.Get())->CreateCommandAllocator(
+        D3D12_COMMAND_LIST_TYPE_DIRECT,
+        IID_PPV_ARGS(cmdListAlloc.GetAddressOf())));
+    /* per pass constants only need to be updated once per rendering pass */
+    PassCB = std::make_unique<UploadBuffer<PassConstants>>((md3dDevice.Get()),
+        1, true);
+    /*  the object constants only need to change when an object’s world matrix
+     changes */
+    ObjectCB = std::make_unique<UploadBuffer<ObjectConstants>>((md3dDevice.Get()),
+        5, true);
+    /*for (int i = 0; i < gNumFrameResources; i++) {
         _frameResources.push_back(std::make_unique<FrameResources>(
             md3dDevice.Get(), 1, (UINT)_allRenderItems.size()));
-    }
+    }*/
 }
 
 void Render::Window::BuildDescriptorHeaps()
@@ -349,45 +358,46 @@ void Render::Window::BuildConstantBufferViews()
     (ObjectConstants));
     UINT objCount = (UINT)_opaqueRenderItems.size();
     // Need a CBV descriptor for each object for each frame resource.
-    for (int frameIndex = 0; frameIndex < gNumFrameResources; frameIndex++) {
-        auto objectCB = _frameResources[frameIndex]->ObjectCB->Resource();
-        for (UINT i = 0; i < objCount; ++i) {
-            D3D12_GPU_VIRTUAL_ADDRESS cbAddress =
-                objectCB->GetGPUVirtualAddress();
-            // Offset to the ith object constant buffer heap 
-            // in the current buffer.
-            cbAddress += i * objCBByteSize;
-            // Offset to the object CBV in the descriptor heap.
-            int heapIndex = frameIndex * objCount + i;
-            /* Once we know the descriptor increment size,
-            we can use one of the two CD3DX12_CPU_DESCRIPTOR_HANDLE::Offset
-            methods to offset the handle by n descriptors: */
-            auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(
-                _cbvHeap->GetCPUDescriptorHandleForHeapStart());
-            handle.Offset(heapIndex, mCbvSrvUavDescriptorSize);
-            D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-            cbvDesc.BufferLocation = cbAddress;
-            cbvDesc.SizeInBytes = objCBByteSize;
-            md3dDevice->CreateConstantBufferView(&cbvDesc, handle);
-        }
-    }
-    UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof
-    (PassConstants));
-    // Last three descriptors are the pass CBVs for each frame resource.
-    for (int frameIndex = 0; frameIndex < gNumFrameResources; frameIndex++) {
-        auto passCB = _frameResources[frameIndex]->PassCB->Resource();
-        // Pass buffer only stores one cbuffer per frame resource.
-        D3D12_GPU_VIRTUAL_ADDRESS cbAddress = passCB->GetGPUVirtualAddress();
-        // Offset to the pass cbv in the descriptor heap.
-        int heapIndex = _passCbvOffset + frameIndex;
+    //for (int frameIndex = 0; frameIndex < gNumFrameResources; frameIndex++) {
+    int frameIndex = 0;
+    auto objectCB = ObjectCB->Resource();
+    for (UINT i = 0; i < objCount; ++i) {
+        D3D12_GPU_VIRTUAL_ADDRESS cbAddress =
+            objectCB->GetGPUVirtualAddress();
+        // Offset to the ith object constant buffer heap 
+        // in the current buffer.
+        cbAddress += i * objCBByteSize;
+        // Offset to the object CBV in the descriptor heap.
+        int heapIndex = frameIndex * objCount + i;
+        /* Once we know the descriptor increment size,
+        we can use one of the two CD3DX12_CPU_DESCRIPTOR_HANDLE::Offset
+        methods to offset the handle by n descriptors: */
         auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(
             _cbvHeap->GetCPUDescriptorHandleForHeapStart());
         handle.Offset(heapIndex, mCbvSrvUavDescriptorSize);
         D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
         cbvDesc.BufferLocation = cbAddress;
-        cbvDesc.SizeInBytes = passCBByteSize;
+        cbvDesc.SizeInBytes = objCBByteSize;
         md3dDevice->CreateConstantBufferView(&cbvDesc, handle);
     }
+    //}
+    UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof
+    (PassConstants));
+    // Last three descriptors are the pass CBVs for each frame resource.
+    //for (int frameIndex = 0; frameIndex < gNumFrameResources; frameIndex++) {
+    auto passCB = PassCB->Resource();
+    // Pass buffer only stores one cbuffer per frame resource.
+    D3D12_GPU_VIRTUAL_ADDRESS cbAddress = passCB->GetGPUVirtualAddress();
+    // Offset to the pass cbv in the descriptor heap.
+    int heapIndex = _passCbvOffset + frameIndex;
+    auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(
+        _cbvHeap->GetCPUDescriptorHandleForHeapStart());
+    handle.Offset(heapIndex, mCbvSrvUavDescriptorSize);
+    D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
+    cbvDesc.BufferLocation = cbAddress;
+    cbvDesc.SizeInBytes = passCBByteSize;
+    md3dDevice->CreateConstantBufferView(&cbvDesc, handle);
+    //}
 }
 
 void Render::Window::BuildPSOs()
@@ -428,29 +438,13 @@ void Render::Window::Update(const GameTimer& gt)
 {
     OnKeyboardInput(gt);
     UpdateCamera(gt);
-
-    // Cycle through the circular frame resource array.
-    _currFrameResourceIndex = (_currFrameResourceIndex + 1) % gNumFrameResources;
-    _currFrameResource = _frameResources[_currFrameResourceIndex].get();
-    // Has the GPU finished processing the commands of the current frame
-    // resource. If not, wait until the GPU has completed commands up to
-    // this fence point.
-    if (_currFrameResource->Fence != 0 && mFence->GetCompletedValue() <
-        _currFrameResource->Fence) {
-        HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
-        ThrowIfFailed(mFence->SetEventOnCompletion(_currFrameResource->Fence,
-            eventHandle));
-        WaitForSingleObject(eventHandle, INFINITE);
-        CloseHandle(eventHandle);
-    }
-    // [...] Update resources in mCurrFrameResource (like cbuffers).
     UpdateObjectCBs(gt);
     UpdateMainPassCB(gt);
 }
 
 void Render::Window::UpdateObjectCBs(const GameTimer& gt)
 {
-    auto currObjectCB = _currFrameResource->ObjectCB.get();
+    auto currObjectCB = ObjectCB.get();
     for (auto& e : _allRenderItems)
     {
         // Only update the cbuffer data if the constants have changed.
@@ -495,7 +489,7 @@ void Render::Window::UpdateMainPassCB(const GameTimer& gt)
     _mainPassCB.FarZ = 1000.0f;
     _mainPassCB.TotalTime = gt.TotalTime();
     _mainPassCB.DeltaTime = gt.DeltaTime();
-    auto currPassCB = _currFrameResource->PassCB.get();
+    auto currPassCB = PassCB.get();
     currPassCB->CopyData(0, _mainPassCB);
 }
 
@@ -504,7 +498,7 @@ void Render::Window::DrawRenderItems(ID3D12GraphicsCommandList* cmdList,
 {
     UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(
         sizeof(ObjectConstants));
-    auto objectCB = _currFrameResource->ObjectCB->Resource();
+    auto objectCB = ObjectCB->Resource();
 
     // For each render item...
     for (size_t i = 0; i < ritems.size(); ++i) {
@@ -514,8 +508,8 @@ void Render::Window::DrawRenderItems(ID3D12GraphicsCommandList* cmdList,
         cmdList->IASetPrimitiveTopology(ri->PrimitiveType);
         // Offset to the CBV in the descriptor heap for this object and
         // for this frame resource.
-        UINT cbvIndex = _currFrameResourceIndex *
-            (UINT)_opaqueRenderItems.size() + ri->ObjCBIndex;
+        UINT cbvIndex = /*_currFrameResourceIndex * */
+            /*(UINT)_opaqueRenderItems.size() + */ ri->ObjCBIndex;
         auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(
             _cbvHeap->GetGPUDescriptorHandleForHeapStart());
         cbvHandle.Offset(cbvIndex, mCbvSrvUavDescriptorSize);
@@ -527,10 +521,10 @@ void Render::Window::DrawRenderItems(ID3D12GraphicsCommandList* cmdList,
 
 void Render::Window::Draw(const GameTimer& gt)
 {
-    auto cmdListAlloc = _currFrameResource->CmdListAlloc;
-    // Reuse the memory associated with command recording.
-    // We can only reset when the associated command lists have
-    // finished execution on the GPU.
+    // auto cmdListAlloc = CmdListAlloc;
+     // Reuse the memory associated with command recording.
+     // We can only reset when the associated command lists have
+     // finished execution on the GPU.
     ThrowIfFailed(cmdListAlloc->Reset());
     // A command list can be reset after it has been added to the
     // command queue via ExecuteCommandList.
@@ -563,7 +557,8 @@ void Render::Window::Draw(const GameTimer& gt)
     mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps),
         descriptorHeaps);
     mCommandList->SetGraphicsRootSignature(_rootSignature.Get());
-    int passCbvIndex = _passCbvOffset + _currFrameResourceIndex;
+    int passCbvIndex = _passCbvOffset; /* + _currFrameResourceIndex */
+
     auto passCbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(
         _cbvHeap->GetGPUDescriptorHandleForHeapStart());
     passCbvHandle.Offset(passCbvIndex, mCbvSrvUavDescriptorSize);
@@ -583,12 +578,13 @@ void Render::Window::Draw(const GameTimer& gt)
     ThrowIfFailed(mSwapChain->Present(0, 0));
     mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
     // Advance the fence value to mark commands up to this fence point.
-    _currFrameResource->Fence = ++mCurrentFence;
+    /*_currFrameResource->Fence = */// ++mCurrentFence;
     // Add an instruction to the command queue to set a new fence point.
     // Because we are on the GPU timeline, the new fence point won’t be
     // set until the GPU finishes processing all the commands prior to 
     // this Signal().
-    mCommandQueue->Signal(mFence.Get(), mCurrentFence);
+    //mCommandQueue->Signal(mFence.Get(), mCurrentFence);
+    FlushCommandQueue();
 }
 
 void Render::Window::OnResize()
@@ -627,7 +623,8 @@ void Render::Window::OnMouseMove(WPARAM btnState, int x, int y)
 
         // Restrict the angle mPhi.
         mPhi = MathHelper::Clamp(mPhi, 0.1f, MathHelper::Pi - 0.1f);
-    } else if ((btnState & MK_RBUTTON) != 0) {
+    }
+    else if ((btnState & MK_RBUTTON) != 0) {
         // Make each pixel correspond to 0.2 unit in the scene.
         float dx = 0.05f * static_cast<float>(x - mLastMousePos.x);
         float dy = 0.05f * static_cast<float>(y - mLastMousePos.y);
@@ -666,7 +663,7 @@ void Render::Window::UpdateCamera(const GameTimer& gt)
 
 void Render::Window::MessageLoop()
 {
-    MSG msg = {0};
+    MSG msg = { 0 };
 
     if (msg.message == WM_QUIT)
     {
