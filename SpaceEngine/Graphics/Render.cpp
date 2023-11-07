@@ -320,10 +320,20 @@ void Render::Window::buildGPUBuffers()
 
 void Render::Window::BuildFrameResources()
 {
-    for (int i = 0; i < gNumFrameResources; i++) {
+    ThrowIfFailed((md3dDevice.Get())->CreateCommandAllocator(
+        D3D12_COMMAND_LIST_TYPE_DIRECT,
+        IID_PPV_ARGS(cmdListAlloc.GetAddressOf())));
+    /* per pass constants only need to be updated once per rendering pass */
+    PassCB = std::make_unique<UploadBuffer<PassConstants>>((md3dDevice.Get()),
+        1, true);
+    /*  the object constants only need to change when an object’s world matrix
+     changes */
+    ObjectCB = std::make_unique<UploadBuffer<ObjectConstants>>((md3dDevice.Get()),
+        5, true);
+    /*for (int i = 0; i < gNumFrameResources; i++) {
         _frameResources.push_back(std::make_unique<FrameResources>(
             md3dDevice.Get(), 1, (UINT)_allRenderItems.size()));
-    }
+    }*/
 }
 
 void Render::Window::BuildDescriptorHeaps()
@@ -349,8 +359,9 @@ void Render::Window::BuildConstantBufferViews()
     (ObjectConstants));
     UINT objCount = (UINT)_opaqueRenderItems.size();
     // Need a CBV descriptor for each object for each frame resource.
-    for (int frameIndex = 0; frameIndex < gNumFrameResources; frameIndex++) {
-        auto objectCB = _frameResources[frameIndex]->ObjectCB->Resource();
+    //for (int frameIndex = 0; frameIndex < gNumFrameResources; frameIndex++) {
+    int frameIndex = 0;
+        auto objectCB = ObjectCB->Resource();
         for (UINT i = 0; i < objCount; ++i) {
             D3D12_GPU_VIRTUAL_ADDRESS cbAddress =
                 objectCB->GetGPUVirtualAddress();
@@ -370,12 +381,12 @@ void Render::Window::BuildConstantBufferViews()
             cbvDesc.SizeInBytes = objCBByteSize;
             md3dDevice->CreateConstantBufferView(&cbvDesc, handle);
         }
-    }
+    //}
     UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof
     (PassConstants));
     // Last three descriptors are the pass CBVs for each frame resource.
-    for (int frameIndex = 0; frameIndex < gNumFrameResources; frameIndex++) {
-        auto passCB = _frameResources[frameIndex]->PassCB->Resource();
+    //for (int frameIndex = 0; frameIndex < gNumFrameResources; frameIndex++) {
+        auto passCB = PassCB->Resource();
         // Pass buffer only stores one cbuffer per frame resource.
         D3D12_GPU_VIRTUAL_ADDRESS cbAddress = passCB->GetGPUVirtualAddress();
         // Offset to the pass cbv in the descriptor heap.
@@ -387,7 +398,7 @@ void Render::Window::BuildConstantBufferViews()
         cbvDesc.BufferLocation = cbAddress;
         cbvDesc.SizeInBytes = passCBByteSize;
         md3dDevice->CreateConstantBufferView(&cbvDesc, handle);
-    }
+    //}
 }
 
 void Render::Window::BuildPSOs()
@@ -428,29 +439,13 @@ void Render::Window::Update(const GameTimer& gt)
 {
     OnKeyboardInput(gt);
     UpdateCamera(gt);
-
-    // Cycle through the circular frame resource array.
-    _currFrameResourceIndex = (_currFrameResourceIndex + 1) % gNumFrameResources;
-    _currFrameResource = _frameResources[_currFrameResourceIndex].get();
-    // Has the GPU finished processing the commands of the current frame
-    // resource. If not, wait until the GPU has completed commands up to
-    // this fence point.
-    if (_currFrameResource->Fence != 0 && mFence->GetCompletedValue() <
-        _currFrameResource->Fence) {
-        HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
-        ThrowIfFailed(mFence->SetEventOnCompletion(_currFrameResource->Fence,
-            eventHandle));
-        WaitForSingleObject(eventHandle, INFINITE);
-        CloseHandle(eventHandle);
-    }
-    // [...] Update resources in mCurrFrameResource (like cbuffers).
     UpdateObjectCBs(gt);
     UpdateMainPassCB(gt);
 }
 
 void Render::Window::UpdateObjectCBs(const GameTimer& gt)
 {
-    auto currObjectCB = _currFrameResource->ObjectCB.get();
+    auto currObjectCB = ObjectCB.get();
     for (auto& e : _allRenderItems)
     {
         // Only update the cbuffer data if the constants have changed.
@@ -495,7 +490,7 @@ void Render::Window::UpdateMainPassCB(const GameTimer& gt)
     _mainPassCB.FarZ = 1000.0f;
     _mainPassCB.TotalTime = gt.TotalTime();
     _mainPassCB.DeltaTime = gt.DeltaTime();
-    auto currPassCB = _currFrameResource->PassCB.get();
+    auto currPassCB = PassCB.get();
     currPassCB->CopyData(0, _mainPassCB);
 }
 
@@ -504,7 +499,7 @@ void Render::Window::DrawRenderItems(ID3D12GraphicsCommandList* cmdList,
 {
     UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(
         sizeof(ObjectConstants));
-    auto objectCB = _currFrameResource->ObjectCB->Resource();
+    auto objectCB = ObjectCB->Resource();
 
     // For each render item...
     for (size_t i = 0; i < ritems.size(); ++i) {
@@ -514,8 +509,8 @@ void Render::Window::DrawRenderItems(ID3D12GraphicsCommandList* cmdList,
         cmdList->IASetPrimitiveTopology(ri->PrimitiveType);
         // Offset to the CBV in the descriptor heap for this object and
         // for this frame resource.
-        UINT cbvIndex = _currFrameResourceIndex *
-            (UINT)_opaqueRenderItems.size() + ri->ObjCBIndex;
+        UINT cbvIndex = /*_currFrameResourceIndex * */
+            /*(UINT)_opaqueRenderItems.size() + */ ri->ObjCBIndex;
         auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(
             _cbvHeap->GetGPUDescriptorHandleForHeapStart());
         cbvHandle.Offset(cbvIndex, mCbvSrvUavDescriptorSize);
@@ -527,7 +522,7 @@ void Render::Window::DrawRenderItems(ID3D12GraphicsCommandList* cmdList,
 
 void Render::Window::Draw(const GameTimer& gt)
 {
-    auto cmdListAlloc = _currFrameResource->CmdListAlloc;
+   // auto cmdListAlloc = CmdListAlloc;
     // Reuse the memory associated with command recording.
     // We can only reset when the associated command lists have
     // finished execution on the GPU.
@@ -563,7 +558,8 @@ void Render::Window::Draw(const GameTimer& gt)
     mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps),
         descriptorHeaps);
     mCommandList->SetGraphicsRootSignature(_rootSignature.Get());
-    int passCbvIndex = _passCbvOffset + _currFrameResourceIndex;
+    int passCbvIndex = _passCbvOffset; /* + _currFrameResourceIndex */
+
     auto passCbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(
         _cbvHeap->GetGPUDescriptorHandleForHeapStart());
     passCbvHandle.Offset(passCbvIndex, mCbvSrvUavDescriptorSize);
@@ -583,12 +579,13 @@ void Render::Window::Draw(const GameTimer& gt)
     ThrowIfFailed(mSwapChain->Present(0, 0));
     mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
     // Advance the fence value to mark commands up to this fence point.
-    _currFrameResource->Fence = ++mCurrentFence;
+    /*_currFrameResource->Fence = */// ++mCurrentFence;
     // Add an instruction to the command queue to set a new fence point.
     // Because we are on the GPU timeline, the new fence point won’t be
     // set until the GPU finishes processing all the commands prior to 
     // this Signal().
-    mCommandQueue->Signal(mFence.Get(), mCurrentFence);
+    //mCommandQueue->Signal(mFence.Get(), mCurrentFence);
+    FlushCommandQueue();
 }
 
 void Render::Window::OnResize()

@@ -139,10 +139,10 @@ namespace Render
 
 
         // FRAME RESSOURCES
-        static const int _numFrameResources = 3;
-        std::vector<std::unique_ptr<FrameResources>> _frameResources;
-        FrameResources* _currFrameResource = nullptr;
-        int _currFrameResourceIndex = 0;
+        //static const int _numFrameResources = 3;
+        //std::vector<std::unique_ptr<FrameResources>> _frameResources;
+        //FrameResources* _currFrameResource = nullptr;
+        //int _currFrameResourceIndex = 0;
 
         // List of all the render items.
         std::vector<std::unique_ptr<RenderItem>> _allRenderItems;
@@ -173,6 +173,14 @@ namespace Render
         float mRadius = 15.0f;
 
         std::vector<std::shared_ptr<GameObject>> _gameObjects;
+
+
+        Microsoft::WRL::ComPtr<ID3D12CommandAllocator> cmdListAlloc;
+
+        // We cannot update a cbuffer until the GPU is done processing the
+        // commands that reference it. So each frame needs their own cbuffers.
+        std::unique_ptr<UploadBuffer<PassConstants>> PassCB = nullptr;
+        std::unique_ptr<UploadBuffer<ObjectConstants>> ObjectCB = nullptr;
     };
 
 }
