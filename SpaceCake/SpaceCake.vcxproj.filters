@@ -37,7 +37,7 @@
     <ClInclude Include="Source\App.h">
       <Filter>Source\Public</Filter>
     </ClInclude>
-    <ClInclude Include="Source\pch.h">
+    <ClInclude Include="Headers\pch.h">
       <Filter>Source\pch</Filter>
     </ClInclude>
   </ItemGroup>
