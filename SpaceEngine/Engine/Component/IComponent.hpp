@@ -7,8 +7,9 @@
 
 #ifndef ICOMPONENT_HPP_
 #define ICOMPONENT_HPP_
-#include "../Entity.hpp"
 #include <memory>
+#include <string>
+#include <unordered_map>
 
 namespace SpaceEngine {
     struct Vector3f {

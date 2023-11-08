@@ -10,10 +10,7 @@
 
 #include "Component/IComponent.hpp"
 #include "Component/Transform.h"
-
-// to remove
-#include "Component/Color.hpp"
-#include "Component/Health.hpp"
-#include "Component/Motion.hpp"
+#include "Component/BoxMesh.h"
+#include "Component/SphereMesh.h"
 
 #endif /* !COMPONENTS_HPP_ */
