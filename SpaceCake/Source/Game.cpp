@@ -1,13 +1,14 @@
 #include "Headers/Game.h"
-//#include "Game.h"
+// #include "Engine.h"
+// #include "Engine/Core/Core.h"
+// #include "Game.h"
 
-// pass the engine to the game via constructor
 std::shared_ptr<Game> Game::_instance = nullptr;
 
-void myScript(void* engine, void* renderApp)
+void myScript(void *engine, void *renderApp)
 {
-    Render::Window* render = (Render::Window*)renderApp;
-    SpaceEngine::Engine* myEngine = (SpaceEngine::Engine*)engine;
+    Render::Window *render = (Render::Window *)renderApp;
+    SpaceEngine::Engine *myEngine = (SpaceEngine::Engine *)engine;
     static float ftime = 0;
 
     if (render->getTotalTime() - ftime >= 4)
@@ -19,17 +20,19 @@ void myScript(void* engine, void* renderApp)
     }
 }
 
-Game::Game(SpaceEngine::Engine engine) :_engine (engine)
+Game::Game(SpaceEngine::Engine engine) : _engine(engine)
 {
- 
 }
 
 Game::~Game()
 {
 }
 
-void Game::run()
+void Game::init()
 {
+
+    // Set initial values
+    _isRunning = true;
 
     _engine.createWindow(1920, 1080, L"SpaceCake");
     _engine.init();
@@ -39,7 +42,7 @@ void Game::run()
     std::shared_ptr<SpaceEngine::Entity> obj = _engine.createEntity("obj");
     std::shared_ptr<SpaceEngine::Entity> empty = _engine.createEntity("empty");
     std::shared_ptr<SpaceEngine::Script> scriptFemiTest = empty->addComponent<SpaceEngine::Script>();
-    
+
     scriptFemiTest->setScript(myScript);
     std::shared_ptr<SpaceEngine::Transform> cube1Transform = cube_1->getComponent<SpaceEngine::Transform>();
     std::shared_ptr<SpaceEngine::Transform> cube2Transform = cube_2->getComponent<SpaceEngine::Transform>();
@@ -48,14 +51,17 @@ void Game::run()
     std::shared_ptr<SpaceEngine::BoxMesh> cube2Mesh = cube_2->addComponent<SpaceEngine::BoxMesh>();
     std::shared_ptr<SpaceEngine::SphereMesh> sphereMesh = obj->addComponent<SpaceEngine::SphereMesh>();
 
-    cube1Transform->setPosition({ 0, 1, 0 });
-    cube2Transform->setPosition({ 2, 0, 0 });
-    objTransform->setPosition({ -2, 0, -1 });
+    cube1Transform->setPosition({0, 1, 0});
+    cube2Transform->setPosition({2, 0, 0});
+    objTransform->setPosition({-2, 0, -1});
 
-    cube1Transform->setScale({ 3, 3, 3 });
-    cube2Transform->setScale({ 2, 2, 2 });
-    objTransform->setScale({ 2, 2, 2 });
+    cube1Transform->setScale({3, 3, 3});
+    cube2Transform->setScale({2, 2, 2});
+    objTransform->setScale({2, 2, 2});
+}
 
+void Game::run()
+{
     _engine.run();
 }
 

@@ -13,5 +13,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 {
     SpaceEngine::Engine engine(hInstance);
     Game game = Game(engine);
+    game.init();
     game.run();
 }

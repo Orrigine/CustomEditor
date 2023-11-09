@@ -1,15 +1,15 @@
 #include "Core.h"
 
-namespace SpaceEngine {
-    
+namespace SpaceEngine
+{
+
     Engine::Engine(HINSTANCE hInstance) : _hInstance(hInstance),
-        _renderApplication(new Render::Window(hInstance))//, _renderSystem(new RenderSystem())
+                                          _renderApplication(new Render::Window(hInstance)) //, _renderSystem(new RenderSystem())
     {
         std::shared_ptr<RenderSystem> render(new RenderSystem());
         std::shared_ptr<ScriptSystem> script(new ScriptSystem());
         _systems.push_back(render);
         _systems.push_back(script);
-
     }
 
     Engine::~Engine()
@@ -29,7 +29,7 @@ namespace SpaceEngine {
     void Engine::init()
     {
         _renderApplication->Initialize();
-        _renderApplication->setEngine( (void *) this);
+        _renderApplication->setEngine((void *)this);
     }
 
     int Engine::run()
@@ -38,9 +38,9 @@ namespace SpaceEngine {
         {
             for (int i = 0; i < _systems.size(); i++)
                 _systems[i]->init(&_entitiesMap, _renderApplication);
-            return(_renderApplication->Run());
+            return (_renderApplication->Run());
         }
-        catch (DxException& e)
+        catch (DxException &e)
         {
             MessageBox(nullptr, e.ToString().c_str(), L"Engine Failed Init", MB_OK);
             return 84;
@@ -49,13 +49,14 @@ namespace SpaceEngine {
     }
 
     std::shared_ptr<Entity> Engine::createEntity(std::string name, std::string type)
-	{
-		std::shared_ptr<Entity> entity(new Entity(name, type));
+    {
+        std::shared_ptr<Entity> entity(new Entity(name, type));
 
-		entity->addComponent<SpaceEngine::Transform>();
-		_entitiesMap[entity->getId()] = entity;
-		return entity;
-	}
+        entity->addComponent<SpaceEngine::Transform>();
+        _entitiesMap[entity->getId()] = entity;
+        _entityNameMap[name] = entity;
+        return entity;
+    }
 
     std::unordered_map<unsigned int, std::shared_ptr<Entity>> Engine::getEntities()
     {
@@ -70,5 +71,9 @@ namespace SpaceEngine {
     std::shared_ptr<Render::Window> Engine::getRenderApplication()
     {
         return _renderApplication;
+    }
+    std::shared_ptr<Entity> Engine::getEntity(std::string name)
+    {
+        return _entityNameMap[name];
     }
 };
