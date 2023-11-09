@@ -7,6 +7,7 @@
 
 #include "Headers/SpaceEngine.h"
 #include "Common/Headers/GeometryGenerator.h"
+#include "Common/Headers/Camera.h"
 
 struct ObjectConstants
 {
@@ -171,9 +172,9 @@ namespace Render
 
         bool _isWireframe = false;
 
-        DirectX::XMFLOAT3 _eyePos = { 0.0f, 0.0f, 0.0f };
-        DirectX::XMFLOAT4X4 _view = MathHelper::Identity4x4();
-        DirectX::XMFLOAT4X4 _proj = MathHelper::Identity4x4();
+       // DirectX::XMFLOAT3 _eyePos = { 0.0f, 0.0f, 0.0f };
+        //DirectX::XMFLOAT4X4 _view = MathHelper::Identity4x4();
+        //DirectX::XMFLOAT4X4 _proj = MathHelper::Identity4x4();
 
         std::unordered_map<std::string, std::unique_ptr<MeshGeometry>>
             _geometries;
@@ -181,9 +182,11 @@ namespace Render
         Microsoft::WRL::ComPtr<ID3D12PipelineState> _pso;
         POINT mLastMousePos;
 
-        float mTheta = 1.5f * DirectX::XM_PI;
-        float mPhi = 0.2f * DirectX::XM_PI;
-        float mRadius = 15.0f;
+        //float mTheta = 1.5f * DirectX::XM_PI;
+        //float mPhi = 0.2f * DirectX::XM_PI;
+        //float mRadius = 15.0f;
+
+        Camera _camera;
 
         std::vector<std::shared_ptr<GameObject>> _gameObjects;
         Microsoft::WRL::ComPtr<ID3D12CommandAllocator> cmdListAlloc;

@@ -341,8 +341,12 @@ void Render::Window::UpdateObjectCBs(const GameTimer& gt)
 
 void Render::Window::UpdateMainPassCB(const GameTimer& gt)
 {
-    DirectX::XMMATRIX view = XMLoadFloat4x4(&_view);
-    DirectX::XMMATRIX proj = XMLoadFloat4x4(&_proj);
+    DirectX::XMMATRIX view = _camera.GetView();
+    DirectX::XMMATRIX proj = _camera.GetProj();
+   // DirectX::XMMATRIX view = XMLoadFloat4x4(&_view);
+   // DirectX::XMMATRIX proj = XMLoadFloat4x4(&_proj);
+
+
     DirectX::XMMATRIX viewProj = XMMatrixMultiply(view, proj);
     DirectX::XMMATRIX invView = XMMatrixInverse(
         &XMMatrixDeterminant(view), view);
@@ -357,7 +361,8 @@ void Render::Window::UpdateMainPassCB(const GameTimer& gt)
     XMStoreFloat4x4(&_mainPassCB.ViewProj, XMMatrixTranspose(viewProj));
     XMStoreFloat4x4(&_mainPassCB.InvViewProj,
         XMMatrixTranspose(invViewProj));
-    _mainPassCB.EyePosW = _eyePos;
+    //_mainPassCB.EyePosW = _eyePos;
+    _mainPassCB.EyePosW = _camera.GetPosition3f();
     _mainPassCB.RenderTargetSize = DirectX::XMFLOAT2((float)mClientWidth,
         (float)mClientHeight);
     _mainPassCB.InvRenderTargetSize = DirectX::XMFLOAT2(1.0f / mClientWidth, 1.0f
@@ -442,10 +447,7 @@ void Render::Window::OnResize()
 {
     D3DApp::OnResize();
 
-    // The window resized, so update the aspect ratio and recompute the projection matrix.
-    DirectX::XMMATRIX P = DirectX::XMMatrixPerspectiveFovLH(
-        0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
-    XMStoreFloat4x4(&_proj, P);
+    _camera.SetLens(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
 }
 
 void Render::Window::OnMouseDown(WPARAM btnState, int x, int y)
@@ -463,28 +465,14 @@ void Render::Window::OnMouseUp(WPARAM btnState, int x, int y)
 
 void Render::Window::OnMouseMove(WPARAM btnState, int x, int y)
 {
-    if ((btnState & MK_LBUTTON) != 0) {
+    if ((btnState & MK_LBUTTON) != 0)
+    {
         // Make each pixel correspond to a quarter of a degree.
         float dx = DirectX::XMConvertToRadians(0.25f * static_cast<float>(x - mLastMousePos.x));
         float dy = DirectX::XMConvertToRadians(0.25f * static_cast<float>(y - mLastMousePos.y));
 
-        // Update angles based on input to orbit camera around box.
-        mTheta += dx;
-        mPhi += dy;
-
-        // Restrict the angle mPhi.
-        mPhi = MathHelper::Clamp(mPhi, 0.1f, MathHelper::Pi - 0.1f);
-    }
-    else if ((btnState & MK_RBUTTON) != 0) {
-        // Make each pixel correspond to 0.2 unit in the scene.
-        float dx = 0.05f * static_cast<float>(x - mLastMousePos.x);
-        float dy = 0.05f * static_cast<float>(y - mLastMousePos.y);
-
-        // Update the camera radius based on input.
-        mRadius += dx - dy;
-
-        // Restrict the radius.
-        mRadius = MathHelper::Clamp(mRadius, 5.0f, 150.0f);
+        _camera.Pitch(dy);
+        _camera.RotateY(dx);
     }
 
     mLastMousePos.x = x;
@@ -493,12 +481,26 @@ void Render::Window::OnMouseMove(WPARAM btnState, int x, int y)
 
 void Render::Window::OnKeyboardInput(const GameTimer& gt)
 {
+    const float dt = gt.DeltaTime();
+
+    if (GetAsyncKeyState('Z') & 0x8000)
+        _camera.Walk(10.0f * dt);
+
+    if (GetAsyncKeyState('S') & 0x8000)
+        _camera.Walk(-10.0f * dt);
+
+    if (GetAsyncKeyState('Q') & 0x8000)
+        _camera.Strafe(-10.0f * dt);
+
+    if (GetAsyncKeyState('D') & 0x8000)
+        _camera.Strafe(10.0f * dt);
+    _camera.UpdateViewMatrix();
 }
 
 void Render::Window::UpdateCamera(const GameTimer& gt)
 {
     // Convert Spherical to Cartesian coordinates.
-    _eyePos.x = mRadius * sinf(mPhi) * cosf(mTheta);
+   /* _eyePos.x = mRadius * sinf(mPhi) * cosf(mTheta);
     _eyePos.z = mRadius * sinf(mPhi) * sinf(mTheta);
     _eyePos.y = mRadius * cosf(mPhi);
 
@@ -508,7 +510,7 @@ void Render::Window::UpdateCamera(const GameTimer& gt)
     DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
     DirectX::XMMATRIX view = DirectX::XMMatrixLookAtLH(pos, target, up);
-    DirectX::XMStoreFloat4x4(&_view, view);
+    DirectX::XMStoreFloat4x4(&_view, view);*/
 }
 
 
