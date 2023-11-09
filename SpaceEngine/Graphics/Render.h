@@ -86,6 +86,10 @@ namespace Render
         void CALLBACK CreateGameWindow(LPCWSTR, int, int);
         void InitializeVariables(/*std::wstring,*/ int, int);
 
+        void setEngine(void *engine);
+        void* getEngine();
+        float getTotalTime();
+
     private:
         static std::shared_ptr<Render::Window> _instance;
         static LRESULT CALLBACK WindowProcess(HWND, UINT, WPARAM, LPARAM);
@@ -180,6 +184,9 @@ namespace Render
         std::vector<std::shared_ptr<GameObject>> _gameObjects;
         Microsoft::WRL::ComPtr<ID3D12CommandAllocator> cmdListAlloc;
         std::unique_ptr<UploadBuffer<PassConstants>> passCB = nullptr;
+
+        void* _engine;
+        float _elapsedTime;
     };
 
 

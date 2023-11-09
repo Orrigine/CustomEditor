@@ -99,6 +99,12 @@
     <ClCompile Include="Engine\Component\SphereMesh.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Component\Script.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\System\ScriptSystem.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Platform\WIN32\IApp.h">
@@ -183,6 +189,12 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Component\SphereMesh.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Component\Script.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\System\ScriptSystem.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>

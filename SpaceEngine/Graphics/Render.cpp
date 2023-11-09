@@ -1,4 +1,6 @@
 #include <Graphics.h>
+#include "Engine.h"
+//#include "Engine/System/ISystem.h"
 
 int const gNumFrameResources = 1;
 
@@ -8,7 +10,7 @@ std::shared_ptr<Render::Window> Render::Window::_instance = nullptr;
 
 Render::Window::Window(HINSTANCE hInstance) : D3DApp(hInstance),
 _shapesIndices(1), _lastGeoIndexOffset(0), _lastGeoIndicesSize(0),
-_lastGeoVertexOffset(0), _lastGeoVerticesSize(0), _objCBIndex(0)
+_lastGeoVertexOffset(0), _lastGeoVerticesSize(0), _objCBIndex(0), _engine(nullptr)
 {
     auto geo = std::make_unique<MeshGeometry>();
 
@@ -336,11 +338,41 @@ void Render::Window::BuildPSOs()
         &opaquePsoDesc, IID_PPV_ARGS(&_pso)));
 }
 
+void Render::Window::setEngine(void* engine)
+{
+    _engine = engine;
+}
+
+void *Render::Window::getEngine()
+{
+    return _engine;
+}
+
+float Render::Window::getTotalTime()
+{
+    return _elapsedTime;
+}
+
 void Render::Window::Update(const GameTimer& gt)
 {
+    _elapsedTime = gt.TotalTime();
+    
+    SpaceEngine::Engine* engine = (SpaceEngine::Engine*) _engine;
+    std::vector<std::shared_ptr<SpaceEngine::ISystem>> systems = engine->getSystems();
     OnKeyboardInput(gt);
     UpdateCamera(gt);
+    //SpaceEngine::print("---------------- Total:" + std::to_string(gt.TotalTime()) + "---------------------\n");
+    //SpaceEngine::print("---------------- Delta:" + std::to_string(gt.DeltaTime()) + "---------------------\n");
+    //if (gt.DeltaTime() >= 5)
+      //  SpaceEngine::print("eurekakaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
+
+    for (int i = 0; i < systems.size(); i++) {
+        systems[i]->init(&engine->getEntities(), engine->getRenderApplication());
+        systems[i]->update(&engine->getEntities(), engine->getRenderApplication());
+    }
+
     buildGameObjects();
+
     UpdateObjectCBs(gt);
     UpdateMainPassCB(gt);
 }
@@ -355,7 +387,7 @@ void Render::Window::UpdateObjectCBs(const GameTimer& gt)
         DirectX::XMMATRIX world = XMLoadFloat4x4(&e->World);
         ObjectConstants objConstants;
         XMStoreFloat4x4(&objConstants.World, XMMatrixTranspose(world));
-        currObjectCB->CopyData(/*e->ObjCBIndex */0 , objConstants);
+        currObjectCB->CopyData(0 , objConstants);
     }
 }
 
