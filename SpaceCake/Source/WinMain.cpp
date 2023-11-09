@@ -27,7 +27,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 {
     SpaceEngine::Engine engine(hInstance);
 
-    engine.createWindow(800, 600, L"SpaceCake");
+    engine.createWindow(1920, 1080, L"SpaceCake");
 
     std::shared_ptr<SpaceEngine::Entity> cube_1 = engine.createEntity("cube1");
     std::shared_ptr<SpaceEngine::Entity> cube_2 = engine.createEntity("cube2");

@@ -110,6 +110,21 @@ bool Render::Window::Initialize()
     */
 }
 
+void Render::Window::setWidth(int width)
+{
+    mClientWidth = width;
+}
+
+void Render::Window::setHeight(int height)
+{
+    mClientHeight = height;
+}
+
+void Render::Window::setWindowName(std::wstring name)
+{
+    mMainWindowName = name;
+}
+
 void Render::Window::BuildRootSignature()
 {
    // Root parameter can be a table, root descriptor or root constants.

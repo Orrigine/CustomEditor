@@ -21,6 +21,9 @@ namespace SpaceEngine {
         _width = width;
         _height = height;
         _title = title;
+        _renderApplication->setWidth(width);
+        _renderApplication->setHeight(height);
+        _renderApplication->setWindowName(title);
     }
 
     void Engine::init()

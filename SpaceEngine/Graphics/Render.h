@@ -82,6 +82,10 @@ namespace Render
 
         virtual bool Initialize() override;
 
+        void setWidth(int );
+        void setHeight(int );
+        void setWindowName(std::wstring );
+
         static std::shared_ptr<Render::Window> GetInstance();
         void CALLBACK CreateGameWindow(LPCWSTR, int, int);
         void InitializeVariables(/*std::wstring,*/ int, int);
