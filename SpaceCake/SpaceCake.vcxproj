@@ -95,13 +95,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source\App.cpp" />
+    <ClCompile Include="Source\Game.cpp" />
     <ClCompile Include="Source\pch.cpp" />
     <ClCompile Include="Source\WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Headers\Game.h" />
     <ClInclude Include="Headers\pch.h" />
-    <ClInclude Include="Source\App.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SpaceEngine\SpaceEngine.vcxproj">
