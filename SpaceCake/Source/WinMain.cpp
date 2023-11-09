@@ -2,9 +2,11 @@
 #include "Graphics.h"
 #include <iostream>
 #include "Engine.h"
-
+#include "Code_Entity/SpaceShip.h"
 #pragma region Global Variables
 #pragma endregion
+#define Width 1920
+#define Height 1080
 
 void myScript(void* engine, void* renderApp)
 {
@@ -25,31 +27,36 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 {
     SpaceEngine::Engine engine(hInstance);
 
-    engine.createWindow(1920, 1080, L"SpaceCake");
+    engine.createWindow(Width, Height, L"SpaceCake");
+
+    SpaceShip spaceship(&engine);
 
     std::shared_ptr<SpaceEngine::Entity> cube_1 = engine.createEntity("cube1");
-    std::shared_ptr<SpaceEngine::Entity> cube_2 = engine.createEntity("cube2");
+    /*std::shared_ptr<SpaceEngine::Entity> cube_2 = engine.createEntity("cube2");
     std::shared_ptr<SpaceEngine::Entity> obj = engine.createEntity("obj");
 
     std::shared_ptr<SpaceEngine::Entity> empty = engine.createEntity("empty");
     std::shared_ptr<SpaceEngine::Script> scriptFemiTest = empty->addComponent<SpaceEngine::Script>();
     scriptFemiTest->setScript(myScript);
- 
     std::shared_ptr<SpaceEngine::Transform> cube1Transform = cube_1->getComponent<SpaceEngine::Transform>();
     std::shared_ptr<SpaceEngine::Transform> cube2Transform = cube_2->getComponent<SpaceEngine::Transform>();
     std::shared_ptr<SpaceEngine::Transform> objTransform = obj->getComponent<SpaceEngine::Transform>();
     std::shared_ptr<SpaceEngine::BoxMesh> cube1Mesh = cube_1->addComponent<SpaceEngine::BoxMesh>();
     std::shared_ptr<SpaceEngine::BoxMesh> cube2Mesh = cube_2->addComponent<SpaceEngine::BoxMesh>();
-    std::shared_ptr<SpaceEngine::SphereMesh> sphereMesh = obj->addComponent<SpaceEngine::SphereMesh>();
+    std::shared_ptr<SpaceEngine::SphereMesh> sphereMesh = obj->addComponent<SpaceEngine::SphereMesh>();*/
 
-    cube1Transform->setPosition({ 0, 1, 0 });
+    /*cube1Transform->setPosition({ 0, 1, 0 });
+    cube1Transform->setScale({ 1,1,1});
+
+
+
     cube2Transform->setPosition({ 2, 0, 0 });
     objTransform->setPosition({ - 2 , 0 , -1});
 
-    cube1Transform->setScale({ 3, 3, 3 });
+    
     cube2Transform->setScale({ 2, 2, 2 });
     objTransform->setScale({ 2, 2, 2 });
-
+    */
     engine.init();
     engine.run();
 }

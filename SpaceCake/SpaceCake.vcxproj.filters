@@ -32,6 +32,9 @@
     <ClCompile Include="Source\WinMain.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Code_Entity\SpaceShip.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\App.h">
@@ -39,6 +42,9 @@
     </ClInclude>
     <ClInclude Include="Headers\pch.h">
       <Filter>Source\pch</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Code_Entity\SpaceShip.h">
+      <Filter>Resources</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

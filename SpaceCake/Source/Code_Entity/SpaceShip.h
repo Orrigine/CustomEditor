@@ -3,12 +3,14 @@
 class SpaceShip
 {
 public:
-	SpaceShip(SpaceEngine::Scene Scene);
+	SpaceShip(SpaceEngine::Engine* Scene);
 	~SpaceShip();
+	void Update();
 
 private:
-	SpaceEngine::Scene* m_Scene;
-	std::shared_ptr<SpaceEngine::Transform>* m_Transform ; 
+	SpaceEngine::Engine* m_Engine;
+	std::shared_ptr<SpaceEngine::Transform> m_Transform ; 
+	std::shared_ptr<SpaceEngine::BoxMesh> m_SpaceShipMesh;  //A revoir 
 	std::shared_ptr<SpaceEngine::Entity> m_SpaceShipEntity;
 
 };

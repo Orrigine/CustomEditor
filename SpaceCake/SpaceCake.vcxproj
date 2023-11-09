@@ -98,10 +98,12 @@
     <ClCompile Include="Source\App.cpp" />
     <ClCompile Include="Source\pch.cpp" />
     <ClCompile Include="Source\WinMain.cpp" />
+    <ClCompile Include="Source\Code_Entity\SpaceShip.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\pch.h" />
     <ClInclude Include="Source\App.h" />
+    <ClInclude Include="Source\Code_Entity\SpaceShip.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SpaceEngine\SpaceEngine.vcxproj">
