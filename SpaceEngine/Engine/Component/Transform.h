@@ -21,6 +21,9 @@ namespace SpaceEngine {
 		Vector3f getRotation() const;
 		Vector3f getScale() const;
 
+		void init(void* engine, void* renderApp);
+		void update(void* engine, void* renderApp);
+
 		// Get all transform components of the scene
 		static std::unordered_map<unsigned int, std::shared_ptr<Transform>> getComponents();
 

@@ -25,6 +25,8 @@ namespace SpaceEngine {
              * 
              */
             virtual ~IComponent() = default;
+            virtual void init(void* engine, void* renderApp) = 0;
+            virtual void update(void* engine, void* renderApp) = 0;
     //        static virtual void addEntity(unsigned int entityId, std::shared_ptr<IComponent> component) = 0;
         protected:
         private:
