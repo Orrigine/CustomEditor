@@ -10,7 +10,7 @@
 namespace SpaceEngine {
 	std::unordered_map<unsigned int, std::shared_ptr<BoxMesh>> BoxMesh::_entitiesBoxMesh = {};
 
-	BoxMesh::BoxMesh() : _meshType("box")
+	BoxMesh::BoxMesh() : _isBuild(false), _meshType("box")
 	{
 	}
 
@@ -32,5 +32,24 @@ namespace SpaceEngine {
 	std::string BoxMesh::getMeshType()
 	{
 		return _meshType;
+	}
+
+	void BoxMesh::init(void* engine, void* renderApp)
+	{
+
+	}
+	void BoxMesh::update(void* engine, void* renderApp)
+	{
+
+	}
+
+	void BoxMesh::setState(bool state)
+	{
+		_isBuild = state;
+	}
+
+	bool BoxMesh::getState()
+	{
+		return _isBuild;
 	}
 }

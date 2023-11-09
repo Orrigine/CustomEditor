@@ -25,15 +25,13 @@ namespace SpaceEngine {
 			Vector3f position = transormComponents[entityId]->getPosition();
 			Vector3f rotation = transormComponents[entityId]->getRotation();
 			Vector3f scale = transormComponents[entityId]->getScale();
-			if (boxMeshComponents[entityId]) {
-				/*Vector3f position = transormComponents[entityId]->getPosition();
-				Vector3f rotation = transormComponents[entityId]->getRotation();
-				Vector3f scale = transormComponents[entityId]->getScale();*/
+			if (boxMeshComponents[entityId] && !(boxMeshComponents[entityId]->getState())) {
+				boxMeshComponents[entityId]->setState(true);
 				renderApplication->createGameObject(boxMeshComponents[entityId]->getMeshType(), DirectX::Colors::BurlyWood,
 					position.x, position.y, position.z, scale.x, scale.y, scale.z);
-					//cout << elm->first << " \t\t\t" << i->second << endl;
 			}
-			if (sphereMeshComponents[entityId]) {
+			if (sphereMeshComponents[entityId] && !(sphereMeshComponents[entityId]->getState())) {
+				sphereMeshComponents[entityId]->setState(true);
 				renderApplication->createGameObject(sphereMeshComponents[entityId]->getMeshType(), DirectX::Colors::BurlyWood,
 					position.x, position.y, position.z, scale.x, scale.y, scale.z);
 			}

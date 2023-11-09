@@ -98,9 +98,11 @@
     <ClCompile Include="Common\Source\MathHelper.cpp" />
     <ClCompile Include="Engine\Entity.cpp" />
     <ClCompile Include="Engine\Scene\Scene.cpp" />
+    <ClCompile Include="Engine\System\ScriptSystem.cpp" />
     <ClCompile Include="Graphics\FrameResource.cpp" />
     <ClCompile Include="Graphics\Render.cpp" />
     <ClCompile Include="Engine\System\RenderSystem.cpp" />
+    <ClCompile Include="Engine\Component\Script.cpp" />
     <ClCompile Include="Source\Platform\WIN32\IApp.cpp" />
     <ClCompile Include="Source\SpaceEngine.cpp" />
     <ClCompile Include="Engine\Component\Transform.cpp" />
@@ -123,6 +125,7 @@
     <ClInclude Include="Engine\Entity.hpp" />
     <ClInclude Include="Engine\Scene\Scene.hpp" />
     <ClInclude Include="Engine\Systems.hpp" />
+    <ClInclude Include="Engine\System\ScriptSystem.h" />
     <ClInclude Include="Engine\System\ISystem.h" />
     <ClInclude Include="Graphics\FrameResource.h" />
     <ClInclude Include="Engine.h" />
@@ -131,6 +134,7 @@
     <ClInclude Include="Graphics\Render.h" />
     <ClInclude Include="Headers\SpaceEngine.h" />
     <ClInclude Include="Engine\System\RenderSystem.h" />
+    <ClInclude Include="Engine\Component\Script.h" />
     <ClInclude Include="Source\Platform\WIN32\IApp.h" />
     <ClInclude Include="Source\Platform\WIN32\WinEntry.h" />
     <ClInclude Include="Engine\Component\Transform.h" />

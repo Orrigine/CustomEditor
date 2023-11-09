@@ -12,5 +12,6 @@
 #include "Component/Transform.h"
 #include "Component/BoxMesh.h"
 #include "Component/SphereMesh.h"
+#include "Component/Script.h"
 
 #endif /* !COMPONENTS_HPP_ */

@@ -74,4 +74,13 @@ namespace SpaceEngine {
 	{
 		return _entitiesTransform;
 	}
+
+	void Transform::init(void* engine, void* renderApp)
+	{
+
+	}
+	void Transform::update(void* engine, void* renderApp)
+	{
+
+	}
 }
