@@ -65,49 +65,21 @@ void Render::Window::CreateWindowClass()
 
 bool Render::Window::Initialize()
 {
-    if (!D3DApp::Initialize()) {
-
+    if (!D3DApp::Initialize())
         return false;
-    }
-    // Reset the command list to prep for initialization commands.
     ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
-
     BuildRootSignature();
-    
     BuildShadersAndInputLayout();
-    
     buildBox("box", DirectX::Colors::BurlyWood);
     buildSphere("sphere", DirectX::Colors::Azure);
-
-    /* Build all app shapes */
-    //ildGameObjects();
-   
-    ///buildShape(0, 1, 0, 3, 3, 3, DirectX::Colors::BlueViolet);
-    //buildShape(2, 0, 0, 2, 2, 2, DirectX::Colors::BurlyWood);*/
-    /* Buils the constant buffers */
-    
     buildGPUBuffers();
-    /* Create the three frames ressources with a copy of thr render item */
     BuildFrameResources();
-    
-    /* Create a PSO for Opaque render items ans transparent render items */
     BuildPSOs();
-
-    // Execute the initialization commands.
     ThrowIfFailed(mCommandList->Close());
     ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
     mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
-    // Wait until initialization is complete.
     FlushCommandQueue();
-
     return true;
-    /*
-        build the new shape
-        create a new render item
-        add it to the frame ressources
-        create a new cbv
-        update the pso ??
-    */
 }
 
 void Render::Window::setWidth(int width)
@@ -127,25 +99,17 @@ void Render::Window::setWindowName(std::wstring name)
 
 void Render::Window::BuildRootSignature()
 {
-   // Root parameter can be a table, root descriptor or root constants.
     CD3DX12_ROOT_PARAMETER slotRootParameter[2];
-    // Create root CBVs.
-   // slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable0);
     slotRootParameter[0].InitAsConstantBufferView(0);
     slotRootParameter[1].InitAsConstantBufferView(1);
-
-    // A root signature is an array of root parameters.
     CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, slotRootParameter, 0, nullptr,
         D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
-    // create a root signature with a single slot which points to a 
-    // descriptor range consisting of a single constant buffer
     Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSig = nullptr;
     Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
     HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc,
         D3D_ROOT_SIGNATURE_VERSION_1, serializedRootSig.GetAddressOf(),
         errorBlob.GetAddressOf());
-
     if (errorBlob != nullptr)
         ::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
     ThrowIfFailed(hr);
@@ -198,19 +162,13 @@ void Render::Window::buildBox(std::string name, const float* color)
     UINT newGeoVertexOffset = _lastGeoVertexOffset + _lastGeoVerticesSize;
     _lastGeoVertexOffset = newGeoVertexOffset;
     _lastGeoVerticesSize = newGeo.Vertices.size();
-    // Cache the starting index for each object in the concatenated index
-    // buffer.
     UINT newGeoIndexOffset = _lastGeoIndexOffset + _lastGeoIndicesSize;
     _lastGeoIndexOffset = newGeoIndexOffset;
     _lastGeoIndicesSize = (UINT)newGeo.Indices32.size();
-    // Define the SubmeshGeometry that cover different
-    // regions of the vertex/index buffers.
     SubmeshGeometry newGeoSubmesh;
     newGeoSubmesh.IndexCount = (UINT)newGeo.Indices32.size();
     newGeoSubmesh.StartIndexLocation = newGeoIndexOffset;
     newGeoSubmesh.BaseVertexLocation = newGeoVertexOffset;
-    // Extract the vertex elements we are interested in and pack the
-    // vertices of all the meshes into one vertex buffer.
     UINT k = _vertices.size();
     /* Copies each geometry vertex into a big one */
     _vertices.resize(_vertices.size() + newGeo.Vertices.size());
@@ -232,52 +190,36 @@ void Render::Window::buildBox(std::string name, const float* color)
 void Render::Window::buildSphere(std::string name, const float* color)
 {
     GeometryGenerator::MeshData newGeo = _geoGen.CreateSphere(1.0f, 20, 20);
-    // We are concatenating all the geometry into one big vertex/index
-    // buffer. So define the regions in the buffer each submesh covers.
-    // Cache the vertex offsets to each object in the concatenated vertex
-    // buffer.
     UINT newGeoVertexOffset = _lastGeoVertexOffset + _lastGeoVerticesSize;
     _lastGeoVertexOffset = newGeoVertexOffset;
     _lastGeoVerticesSize = newGeo.Vertices.size();
-    // Cache the starting index for each object in the concatenated index
-    // buffer.
     UINT newGeoIndexOffset = _lastGeoIndexOffset + _lastGeoIndicesSize;
     _lastGeoIndexOffset = newGeoIndexOffset;
     _lastGeoIndicesSize = (UINT)newGeo.Indices32.size();
-    // Define the SubmeshGeometry that cover different
-    // regions of the vertex/index buffers.
     SubmeshGeometry newGeoSubmesh;
     newGeoSubmesh.IndexCount = (UINT)newGeo.Indices32.size();
     newGeoSubmesh.StartIndexLocation = newGeoIndexOffset;
     newGeoSubmesh.BaseVertexLocation = newGeoVertexOffset;
-    // Extract the vertex elements we are interested in and pack the
-    // vertices of all the meshes into one vertex buffer.
     UINT k = _vertices.size();
-    /* Copies each geometry vertex into a big one */
     _vertices.resize(_vertices.size() + newGeo.Vertices.size());
     for (size_t i = 0; i < newGeo.Vertices.size(); i++, k++) {
         _vertices[k].Pos = newGeo.Vertices[i].Position;
         _vertices[k].Color = DirectX::XMFLOAT4(color);
     }
-    /* Copies each geometry indices into a big one*/
     _indices.insert(_indices.end(),
         std::begin(newGeo.GetIndices16()),
         std::end(newGeo.GetIndices16()));
-    // create vertices and indices upload buffer
     _geometries["shapeGeo"]->DrawArgs[name] = newGeoSubmesh;
 }
 
 void Render::Window::createShape(std::string submesh, float p_x, float p_y,
     float p_z, float scale_x, float scale_y, float scale_z)
 {
-    /* Create the render item */
     auto newRenderItem = std::make_unique<RenderItem>();
-    /* set up its position */
     DirectX::XMMATRIX world =
         DirectX::XMMatrixTranslation(p_x, p_y, p_z)
         * DirectX::XMMatrixScaling(scale_x, scale_y, scale_z);
     DirectX::XMStoreFloat4x4(&newRenderItem->World, world);
-    //newRenderItem->ObjCBIndex = _objCBIndex++;
     newRenderItem->ObjectCB = std::make_unique<UploadBuffer<ObjectConstants>>((md3dDevice.Get()), 1, true);
     newRenderItem->Geo = _geometries["shapeGeo"].get();
     newRenderItem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
@@ -288,18 +230,13 @@ void Render::Window::createShape(std::string submesh, float p_x, float p_y,
     newRenderItem->BaseVertexLocation =
         newRenderItem->Geo->DrawArgs[submesh].BaseVertexLocation;
     _opaqueRenderItems.push_back(newRenderItem.get());
-    /* add the render item to the render items vect */
     _allRenderItems.push_back(std::move(newRenderItem));
 }
 
 void Render::Window::buildGPUBuffers()
 {
-    // create vertices and indices upload buffer
     const UINT vbByteSize = (UINT)_vertices.size() * sizeof(Vertex);
     const UINT ibByteSize = (UINT)_indices.size() * sizeof(std::uint16_t);
-    //auto geo = std::make_unique<MeshGeometry>();
-
-    //geo->Name = "shapeGeo";
     ThrowIfFailed(D3DCreateBlob(vbByteSize, &_geometries["shapeGeo"]->VertexBufferCPU));
     CopyMemory(_geometries["shapeGeo"]->VertexBufferCPU->GetBufferPointer(),
         _vertices.data(), vbByteSize);
@@ -376,10 +313,6 @@ void Render::Window::Update(const GameTimer& gt)
     std::vector<std::shared_ptr<SpaceEngine::ISystem>> systems = engine->getSystems();
     OnKeyboardInput(gt);
     UpdateCamera(gt);
-    //SpaceEngine::print("---------------- Total:" + std::to_string(gt.TotalTime()) + "---------------------\n");
-    //SpaceEngine::print("---------------- Delta:" + std::to_string(gt.DeltaTime()) + "---------------------\n");
-    //if (gt.DeltaTime() >= 5)
-      //  SpaceEngine::print("eurekakaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
 
     for (int i = 0; i < systems.size(); i++) {
         systems[i]->init(&engine->getEntities(), engine->getRenderApplication());

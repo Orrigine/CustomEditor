@@ -12,9 +12,7 @@ void myScript(void* engine, void* renderApp)
     SpaceEngine::Engine *myEngine = (SpaceEngine::Engine*) engine;
     static float ftime = 0;
     
-   // SpaceEngine::print("++++++++++++++++"+ std::to_string( render->getTotalTime()) + "+++++++++++++++++++++++\n");
     if ( render->getTotalTime() - ftime >= 4)  {
-     //   SpaceEngine::print("--------------------------------------------------------------\n");
         std::shared_ptr<SpaceEngine::Entity> entity = myEngine->createEntity("1");
         std::shared_ptr<SpaceEngine::SphereMesh> sphereMesh = entity->addComponent<SpaceEngine::SphereMesh>();
 
