@@ -68,10 +68,11 @@ bool Render::Window::Initialize()
     if (!D3DApp::Initialize())
         return false;
     ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
+    _camera.SetPosition(0.0f, 0.0f, -30.0f);
     BuildRootSignature();
     BuildShadersAndInputLayout();
-    buildBox("box", DirectX::Colors::BurlyWood);
-    buildSphere("sphere", DirectX::Colors::Azure);
+    buildBox("box", DirectX::Colors::AliceBlue);
+    buildSphere("sphere", DirectX::Colors::BurlyWood);
     buildGPUBuffers();
     BuildFrameResources();
     BuildPSOs();
@@ -191,29 +192,6 @@ void Render::Window::buildSphere(std::string name, const float* color)
     _geometries["shapeGeo"]->DrawArgs[name] = newGeoSubmesh;
 }
 
-/*
-void Render::Window::createGameObject(std::string type, const float* color,
-    float p_x, float p_y, float p_z, float scale_x, float scale_y,
-    float scale_z)
-{
-    std::shared_ptr<GameObject> gameObject(new GameObject({ type, color,
-        p_x, p_y, p_z, scale_x, scale_y, scale_z, false }));
-    _gameObjects.push_back(gameObject);
-}*/
-
-/*
-void Render::Window::buildGameObjects()
-{
-    for (int i = 0; i < _gameObjects.size(); i++) {
-        if (!_gameObjects[i]->is_build) {
-            createShape(_gameObjects[i]->type, _gameObjects[i]->p_x, _gameObjects[i]->p_y,
-                _gameObjects[i]->p_z, _gameObjects[i]->scale_x,
-                _gameObjects[i]->scale_y, _gameObjects[i]->scale_z);
-            _gameObjects[i]->is_build = true;
-        }
-    }
-}*/
-
 void Render::Window::createEntity(int id)
 {
     std::unique_ptr<RenderItem> newRenderItem(new RenderItem());
@@ -221,27 +199,15 @@ void Render::Window::createEntity(int id)
         DirectX::XMMatrixTranslation(0, 0, 0)
         * DirectX::XMMatrixScaling(1, 1, 1);
     DirectX::XMStoreFloat4x4(&newRenderItem->World, world);
-   /* newRenderItem->ObjectCB = std::make_unique<UploadBuffer<ObjectConstants>>((md3dDevice.Get()), 1, true);
-    newRenderItem->Geo = _geometries["shapeGeo"].get();
-    newRenderItem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-    newRenderItem->IndexCount = newRenderItem->Geo->DrawArgs[submesh].
-        IndexCount;
-    newRenderItem->StartIndexLocation =
-        newRenderItem->Geo->DrawArgs[submesh].StartIndexLocation;
-    newRenderItem->BaseVertexLocation =
-        newRenderItem->Geo->DrawArgs[submesh].BaseVertexLocation;
-    _opaqueRenderItems.push_back(newRenderItem.get());
-    _allRenderItems.push_back(std::move(newRenderItem));*/
     _renderItems[id] = std::move( newRenderItem );
-    //_allRenderItems.push_back(_renderItems[id]);
 }
 
 void Render::Window::setTransform(int id, float p_x, float p_y, float p_z,
-    float scale_x, float scale_y, float scale_z)
+    float scale_x, float scale_y, float scale_z, float r_x, float r_y, float r_z)
 {
     auto newRenderItem = _renderItems[id];
     DirectX::XMMATRIX world =
-        DirectX::XMMatrixTranslation(p_x, p_y, p_z)
+        DirectX::XMMatrixTranslation(p_x, p_y, p_z) * DirectX::XMMatrixRotationY(r_y)
         * DirectX::XMMatrixScaling(scale_x, scale_y, scale_z);
     DirectX::XMStoreFloat4x4(&newRenderItem->World, world);
 }
@@ -261,27 +227,6 @@ void Render::Window::setMesh(int id, std::string submesh)
     _opaqueRenderItems.push_back(newRenderItem.get());
     _allRenderItems.push_back(newRenderItem);
 }
-
-//void Render::Window::createShape(std::string submesh, float p_x, float p_y,
-  //  float p_z, float scale_x, float scale_y, float scale_z)
-//{
-    /*auto newRenderItem = std::make_unique<RenderItem>();
-    DirectX::XMMATRIX world =
-        DirectX::XMMatrixTranslation(p_x, p_y, p_z)
-        * DirectX::XMMatrixScaling(scale_x, scale_y, scale_z);
-    DirectX::XMStoreFloat4x4(&newRenderItem->World, world);
-    newRenderItem->ObjectCB = std::make_unique<UploadBuffer<ObjectConstants>>((md3dDevice.Get()), 1, true);
-    newRenderItem->Geo = _geometries["shapeGeo"].get();
-    newRenderItem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-    newRenderItem->IndexCount = newRenderItem->Geo->DrawArgs[submesh].
-        IndexCount;
-    newRenderItem->StartIndexLocation =
-        newRenderItem->Geo->DrawArgs[submesh].StartIndexLocation;
-    newRenderItem->BaseVertexLocation =
-        newRenderItem->Geo->DrawArgs[submesh].BaseVertexLocation;
-    _opaqueRenderItems.push_back(newRenderItem.get());
-    _allRenderItems.push_back(std::move(newRenderItem));*/
-//}
 
 void Render::Window::buildGPUBuffers()
 {
@@ -355,29 +300,32 @@ float Render::Window::getTotalTime()
     return _elapsedTime;
 }
 
+float Render::Window::getDeltaTime()
+{
+    return _deltaTime;
+}
+
 void Render::Window::Update(const GameTimer& gt)
 {
     _elapsedTime = gt.TotalTime();
+    _deltaTime  = gt.DeltaTime();
 
     //DirectX::XMMATRIX skullScale = DirectX::XMMatrixScaling(0.2f, 0.2f, 0.2f);
-    DirectX::XMMATRIX skullOffset = DirectX::XMMatrixTranslation(3.0f, 2.0f, 0.0f);
+   /* DirectX::XMMATRIX skullOffset = DirectX::XMMatrixTranslation(3.0f, 2.0f, 0.0f);
     DirectX::XMMATRIX skullLocalRotate = DirectX::XMMatrixRotationY(2.0f * gt.TotalTime());
 
     DirectX::XMMATRIX skullGlobalRotate = DirectX::XMMatrixRotationY(0.5f * gt.TotalTime());
     if (_opaqueRenderItems.size() >= 3)
-        DirectX::XMStoreFloat4x4(&_opaqueRenderItems[2]->World, /*skullScale */ skullLocalRotate * skullOffset * skullGlobalRotate);
+        DirectX::XMStoreFloat4x4(&_opaqueRenderItems[2]->World, /*skullScale / skullLocalRotate * skullOffset * skullGlobalRotate);*/
 
     SpaceEngine::Engine* engine = (SpaceEngine::Engine*) _engine;
     std::vector<std::shared_ptr<SpaceEngine::ISystem>> systems = engine->getSystems();
     OnKeyboardInput(gt);
-    UpdateCamera(gt);
 
     for (int i = 0; i < systems.size(); i++) {
         systems[i]->init(&engine->getEntities(), engine->getRenderApplication());
         systems[i]->update(&engine->getEntities(), engine->getRenderApplication());
     }
-
-    //buildGameObjects();
 
     UpdateObjectCBs(gt);
     UpdateMainPassCB(gt);
@@ -401,10 +349,6 @@ void Render::Window::UpdateMainPassCB(const GameTimer& gt)
 {
     DirectX::XMMATRIX view = _camera.GetView();
     DirectX::XMMATRIX proj = _camera.GetProj();
-   // DirectX::XMMATRIX view = XMLoadFloat4x4(&_view);
-   // DirectX::XMMATRIX proj = XMLoadFloat4x4(&_proj);
-
-
     DirectX::XMMATRIX viewProj = XMMatrixMultiply(view, proj);
     DirectX::XMMATRIX invView = XMMatrixInverse(
         &XMMatrixDeterminant(view), view);
@@ -419,7 +363,6 @@ void Render::Window::UpdateMainPassCB(const GameTimer& gt)
     XMStoreFloat4x4(&_mainPassCB.ViewProj, XMMatrixTranspose(viewProj));
     XMStoreFloat4x4(&_mainPassCB.InvViewProj,
         XMMatrixTranspose(invViewProj));
-    //_mainPassCB.EyePosW = _eyePos;
     _mainPassCB.EyePosW = _camera.GetPosition3f();
     _mainPassCB.RenderTargetSize = DirectX::XMFLOAT2((float)mClientWidth,
         (float)mClientHeight);
@@ -554,23 +497,6 @@ void Render::Window::OnKeyboardInput(const GameTimer& gt)
         _camera.Strafe(10.0f * dt);
     _camera.UpdateViewMatrix();
 }
-
-void Render::Window::UpdateCamera(const GameTimer& gt)
-{
-    // Convert Spherical to Cartesian coordinates.
-   /* _eyePos.x = mRadius * sinf(mPhi) * cosf(mTheta);
-    _eyePos.z = mRadius * sinf(mPhi) * sinf(mTheta);
-    _eyePos.y = mRadius * cosf(mPhi);
-
-    // Build the view matrix.
-    DirectX::XMVECTOR pos = DirectX::XMVectorSet(_eyePos.x, _eyePos.y, _eyePos.z, 1.0f);
-    DirectX::XMVECTOR target = DirectX::XMVectorZero();
-    DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-    DirectX::XMMATRIX view = DirectX::XMMatrixLookAtLH(pos, target, up);
-    DirectX::XMStoreFloat4x4(&_view, view);*/
-}
-
 
 void Render::Window::MessageLoop()
 {

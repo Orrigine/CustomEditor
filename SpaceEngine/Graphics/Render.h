@@ -94,6 +94,7 @@ namespace Render
         void setEngine(void *engine);
         void* getEngine();
         float getTotalTime();
+        float getDeltaTime();
 
     private:
         static std::shared_ptr<Render::Window> _instance;
@@ -111,7 +112,6 @@ namespace Render
         virtual void OnMouseMove(WPARAM btnState, int x, int y)override;
 
         void OnKeyboardInput(const GameTimer& gt);
-        void UpdateCamera(const GameTimer& gt);
 
         void BuildRootSignature();
         void BuildShadersAndInputLayout();
@@ -125,18 +125,11 @@ namespace Render
         void createEntity(int id);
         void setMesh(int id, std::string submesh);
         void setTransform(int, float p_x, float p_y, float p_z,
-            float scale_x, float scale_y, float scale_z);
-      //  void createGameObject(std::string type, const float* color, float p_x, float p_y, float p_z,
-        //    float scale_x, float scale_y, float scale_z);
+            float scale_x, float scale_y, float scale_z, float r_x, float r_y, float r_z);
+
     private:
-       // void createShape(std::string submesh, float p_x, float p_y, float p_z,
-         //   float scale_x, float scale_y, float scale_z);
-        //void buildShape(float p_x, float p_y, float p_z,
-          //  float scale_x, float scale_y, float scale_z, const float* color);
         void buildBox(std::string name, const float* color);
         void buildSphere(std::string name, const float* color);
-        //void buildGameObjects();
-
         void buildGPUBuffers();
 
         void DrawRenderItems(ID3D12GraphicsCommandList* cmdList,
@@ -172,25 +165,13 @@ namespace Render
         std::vector<RenderItem*> _transparentRenderItems;
 
         PassConstants _mainPassCB;
-
         UINT _passCbvOffset = 0;
-
-        bool _isWireframe = false;
-
-       // DirectX::XMFLOAT3 _eyePos = { 0.0f, 0.0f, 0.0f };
-        //DirectX::XMFLOAT4X4 _view = MathHelper::Identity4x4();
-        //DirectX::XMFLOAT4X4 _proj = MathHelper::Identity4x4();
 
         std::unordered_map<std::string, std::unique_ptr<MeshGeometry>>
             _geometries;
         std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3DBlob>> _shaders;
         Microsoft::WRL::ComPtr<ID3D12PipelineState> _pso;
         POINT mLastMousePos;
-
-        //float mTheta = 1.5f * DirectX::XM_PI;
-        //float mPhi = 0.2f * DirectX::XM_PI;
-        //float mRadius = 15.0f;
-
         Camera _camera;
 
         std::vector<std::shared_ptr<GameObject>> _gameObjects;
@@ -199,6 +180,7 @@ namespace Render
 
         void* _engine;
         float _elapsedTime;
+        float _deltaTime;
     };
 
 

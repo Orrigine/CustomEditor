@@ -33,7 +33,7 @@ namespace SpaceEngine {
 			Vector3f rotation = transormComponents[entityId]->getRotation();
 			Vector3f scale = transormComponents[entityId]->getScale();
 
-			renderApplication->setTransform(entityId, position.x, position.y, position.z, scale.x, scale.y, scale.z);
+			renderApplication->setTransform(entityId, position.x, position.y, position.z, scale.x, scale.y, scale.z, rotation.x, rotation.y, rotation.z);
 		}
 
 		for (auto elm = sceneEntitiesMap->begin(); elm != sceneEntitiesMap->end(); elm++) {

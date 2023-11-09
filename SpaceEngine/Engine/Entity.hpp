@@ -101,7 +101,7 @@ namespace SpaceEngine {
 
         // Is this entity of Type type ?
         bool compareType(std::string type) {
-            return type.compare(_type);
+            return !type.compare(_type);
         }
 
         // Activates/Deactivates the entity, depending on 
