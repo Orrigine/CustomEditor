@@ -1,4 +1,8 @@
 #include <Graphics.h>
+#include "Engine.h"
+//#include "Engine/System/ISystem.h"
+
+int const gNumFrameResources = 1;
 
 
 WCHAR WindowClass[MAX_NAME_STRING] = L"SpaceEngineWindowClass";
@@ -6,7 +10,7 @@ std::shared_ptr<Render::Window> Render::Window::_instance = nullptr;
 
 Render::Window::Window(HINSTANCE hInstance) : D3DApp(hInstance),
 _shapesIndices(1), _lastGeoIndexOffset(0), _lastGeoIndicesSize(0),
-_lastGeoVertexOffset(0), _lastGeoVerticesSize(0), _objCBIndex(0)
+_lastGeoVertexOffset(0), _lastGeoVerticesSize(0), _objCBIndex(0), _engine(nullptr)
 {
     auto geo = std::make_unique<MeshGeometry>();
 
@@ -61,87 +65,51 @@ void Render::Window::CreateWindowClass()
 
 bool Render::Window::Initialize()
 {
-    /*
-        - Create the window
-        - Init DirectX
-            - Creer la factory
-            - Creer le device
-            - Creer les fences
-            - Check les tailles des types descriptors (view)
-            - Creer la commande queue et la command list
-            - Creer la swap chain
-            - Creer les heap des descriptors
-    */
-    if (!D3DApp::Initialize()) {
-
+    if (!D3DApp::Initialize())
         return false;
-    }
-    // Reset the command list to prep for initialization commands.
     ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
-    /* Create an empty root signature */
     BuildRootSignature();
-    /* Compile the VS AND PS shaders -- set the vertex input layout */
     BuildShadersAndInputLayout();
-    /* Build all app shapes */
-    buildGameObjects();
-    ///buildShape(0, 1, 0, 3, 3, 3, DirectX::Colors::BlueViolet);
-    //buildShape(2, 0, 0, 2, 2, 2, DirectX::Colors::BurlyWood);*/
-    /* Buils the constant buffers */
+    buildBox("box", DirectX::Colors::BurlyWood);
+    buildSphere("sphere", DirectX::Colors::Azure);
     buildGPUBuffers();
-    /* Create the three frames ressources with a copy of thr render item */
     BuildFrameResources();
-    /* Create the constant buffer heap  */
-    BuildDescriptorHeaps();
-    /* Create a CBV descriptor for each object of each frame resource */
-    BuildConstantBufferViews();
-    /* Create a PSO for Opaque render items ans transparent render items */
     BuildPSOs();
-    // Execute the initialization commands.
     ThrowIfFailed(mCommandList->Close());
     ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
     mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
-    // Wait until initialization is complete.
     FlushCommandQueue();
-
     return true;
-    /*
-        build the new shape
-        create a new render item
-        add it to the frame ressources
-        create a new cbv
-        update the pso ??
-    */
+}
+
+void Render::Window::setWidth(int width)
+{
+    mClientWidth = width;
+}
+
+void Render::Window::setHeight(int height)
+{
+    mClientHeight = height;
+}
+
+void Render::Window::setWindowName(std::wstring name)
+{
+    mMainWindowName = name;
 }
 
 void Render::Window::BuildRootSignature()
 {
-    /* We need to update the root signature to take two descriptor tables:
-    (we need two tables because the CBVs will be set at different frequencies
-        — the per pass CBV only needs to be set once per rendering pass
-        - the per object CBV needs to be set per render item */
-    CD3DX12_DESCRIPTOR_RANGE cbvTable0;
-    cbvTable0.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
-    CD3DX12_DESCRIPTOR_RANGE cbvTable1;
-    cbvTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
-
-    // Root parameter can be a table, root descriptor or root constants.
     CD3DX12_ROOT_PARAMETER slotRootParameter[2];
-    // Create root CBVs.
-    slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable0);
-    slotRootParameter[1].InitAsDescriptorTable(1, &cbvTable1);
-
-    // A root signature is an array of root parameters.
+    slotRootParameter[0].InitAsConstantBufferView(0);
+    slotRootParameter[1].InitAsConstantBufferView(1);
     CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, slotRootParameter, 0, nullptr,
         D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
-    // create a root signature with a single slot which points to a 
-    // descriptor range consisting of a single constant buffer
     Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSig = nullptr;
     Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
     HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc,
         D3D_ROOT_SIGNATURE_VERSION_1, serializedRootSig.GetAddressOf(),
         errorBlob.GetAddressOf());
-
     if (errorBlob != nullptr)
         ::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
     ThrowIfFailed(hr);
@@ -171,18 +139,19 @@ void Render::Window::createGameObject(std::string type, const float* color,
     float scale_z)
 {
     std::shared_ptr<GameObject> gameObject(new GameObject({ type, color,
-        p_x, p_y, p_z, scale_x, scale_y, scale_z }));
+        p_x, p_y, p_z, scale_x, scale_y, scale_z, false }));
     _gameObjects.push_back(gameObject);
 }
 
 void Render::Window::buildGameObjects()
 {
-    buildBox("box", DirectX::Colors::BurlyWood);
-    buildSphere("sphere", DirectX::Colors::Azure);
     for (int i = 0; i < _gameObjects.size(); i++) {
-        createShape(_gameObjects[i]->type, _gameObjects[i]->p_x, _gameObjects[i]->p_y,
-            _gameObjects[i]->p_z, _gameObjects[i]->scale_x,
-            _gameObjects[i]->scale_y, _gameObjects[i]->scale_z);
+        if (!_gameObjects[i]->is_build) {
+            createShape(_gameObjects[i]->type, _gameObjects[i]->p_x, _gameObjects[i]->p_y,
+                _gameObjects[i]->p_z, _gameObjects[i]->scale_x,
+                _gameObjects[i]->scale_y, _gameObjects[i]->scale_z);
+            _gameObjects[i]->is_build = true;
+        }
     }
 }
 
@@ -190,26 +159,16 @@ void Render::Window::buildBox(std::string name, const float* color)
 {
     GeometryGenerator::MeshData newGeo = _geoGen.CreateBox(1.0f, 1.0f,
         1.0f, 3);
-    // We are concatenating all the geometry into one big vertex/index
-    // buffer. So define the regions in the buffer each submesh covers.
-    // Cache the vertex offsets to each object in the concatenated vertex
-    // buffer.
     UINT newGeoVertexOffset = _lastGeoVertexOffset + _lastGeoVerticesSize;
     _lastGeoVertexOffset = newGeoVertexOffset;
     _lastGeoVerticesSize = newGeo.Vertices.size();
-    // Cache the starting index for each object in the concatenated index
-    // buffer.
     UINT newGeoIndexOffset = _lastGeoIndexOffset + _lastGeoIndicesSize;
     _lastGeoIndexOffset = newGeoIndexOffset;
     _lastGeoIndicesSize = (UINT)newGeo.Indices32.size();
-    // Define the SubmeshGeometry that cover different
-    // regions of the vertex/index buffers.
     SubmeshGeometry newGeoSubmesh;
     newGeoSubmesh.IndexCount = (UINT)newGeo.Indices32.size();
     newGeoSubmesh.StartIndexLocation = newGeoIndexOffset;
     newGeoSubmesh.BaseVertexLocation = newGeoVertexOffset;
-    // Extract the vertex elements we are interested in and pack the
-    // vertices of all the meshes into one vertex buffer.
     UINT k = _vertices.size();
     /* Copies each geometry vertex into a big one */
     _vertices.resize(_vertices.size() + newGeo.Vertices.size());
@@ -231,54 +190,37 @@ void Render::Window::buildBox(std::string name, const float* color)
 void Render::Window::buildSphere(std::string name, const float* color)
 {
     GeometryGenerator::MeshData newGeo = _geoGen.CreateSphere(1.0f, 20, 20);
-    // We are concatenating all the geometry into one big vertex/index
-    // buffer. So define the regions in the buffer each submesh covers.
-    // Cache the vertex offsets to each object in the concatenated vertex
-    // buffer.
     UINT newGeoVertexOffset = _lastGeoVertexOffset + _lastGeoVerticesSize;
     _lastGeoVertexOffset = newGeoVertexOffset;
     _lastGeoVerticesSize = newGeo.Vertices.size();
-    // Cache the starting index for each object in the concatenated index
-    // buffer.
     UINT newGeoIndexOffset = _lastGeoIndexOffset + _lastGeoIndicesSize;
     _lastGeoIndexOffset = newGeoIndexOffset;
     _lastGeoIndicesSize = (UINT)newGeo.Indices32.size();
-    // Define the SubmeshGeometry that cover different
-    // regions of the vertex/index buffers.
     SubmeshGeometry newGeoSubmesh;
     newGeoSubmesh.IndexCount = (UINT)newGeo.Indices32.size();
     newGeoSubmesh.StartIndexLocation = newGeoIndexOffset;
     newGeoSubmesh.BaseVertexLocation = newGeoVertexOffset;
-    // Extract the vertex elements we are interested in and pack the
-    // vertices of all the meshes into one vertex buffer.
     UINT k = _vertices.size();
-    /* Copies each geometry vertex into a big one */
     _vertices.resize(_vertices.size() + newGeo.Vertices.size());
     for (size_t i = 0; i < newGeo.Vertices.size(); i++, k++) {
         _vertices[k].Pos = newGeo.Vertices[i].Position;
         _vertices[k].Color = DirectX::XMFLOAT4(color);
     }
-    /* Copies each geometry indices into a big one*/
     _indices.insert(_indices.end(),
         std::begin(newGeo.GetIndices16()),
         std::end(newGeo.GetIndices16()));
-    // create vertices and indices upload buffer
     _geometries["shapeGeo"]->DrawArgs[name] = newGeoSubmesh;
-    // createShape(std::to_string(_shapesIndices), p_x, p_y, p_z, scale_x, scale_y, scale_z);
-     //_shapesIndices++;
 }
 
 void Render::Window::createShape(std::string submesh, float p_x, float p_y,
     float p_z, float scale_x, float scale_y, float scale_z)
 {
-    /* Create the render item */
     auto newRenderItem = std::make_unique<RenderItem>();
-    /* set up its position */
     DirectX::XMMATRIX world =
         DirectX::XMMatrixTranslation(p_x, p_y, p_z)
         * DirectX::XMMatrixScaling(scale_x, scale_y, scale_z);
     DirectX::XMStoreFloat4x4(&newRenderItem->World, world);
-    newRenderItem->ObjCBIndex = _objCBIndex++;
+    newRenderItem->ObjectCB = std::make_unique<UploadBuffer<ObjectConstants>>((md3dDevice.Get()), 1, true);
     newRenderItem->Geo = _geometries["shapeGeo"].get();
     newRenderItem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
     newRenderItem->IndexCount = newRenderItem->Geo->DrawArgs[submesh].
@@ -288,18 +230,13 @@ void Render::Window::createShape(std::string submesh, float p_x, float p_y,
     newRenderItem->BaseVertexLocation =
         newRenderItem->Geo->DrawArgs[submesh].BaseVertexLocation;
     _opaqueRenderItems.push_back(newRenderItem.get());
-    /* add the render item to the render items vect */
     _allRenderItems.push_back(std::move(newRenderItem));
 }
 
 void Render::Window::buildGPUBuffers()
 {
-    // create vertices and indices upload buffer
     const UINT vbByteSize = (UINT)_vertices.size() * sizeof(Vertex);
     const UINT ibByteSize = (UINT)_indices.size() * sizeof(std::uint16_t);
-    //auto geo = std::make_unique<MeshGeometry>();
-
-    //geo->Name = "shapeGeo";
     ThrowIfFailed(D3DCreateBlob(vbByteSize, &_geometries["shapeGeo"]->VertexBufferCPU));
     CopyMemory(_geometries["shapeGeo"]->VertexBufferCPU->GetBufferPointer(),
         _vertices.data(), vbByteSize);
@@ -322,87 +259,12 @@ void Render::Window::BuildFrameResources()
     ThrowIfFailed((md3dDevice.Get())->CreateCommandAllocator(
         D3D12_COMMAND_LIST_TYPE_DIRECT,
         IID_PPV_ARGS(cmdListAlloc.GetAddressOf())));
-    /* per pass constants only need to be updated once per rendering pass */
-    PassCB = std::make_unique<UploadBuffer<PassConstants>>((md3dDevice.Get()),
+    passCB = std::make_unique<UploadBuffer<PassConstants>>((md3dDevice.Get()),
         1, true);
-    /*  the object constants only need to change when an object’s world matrix
-     changes */
-    ObjectCB = std::make_unique<UploadBuffer<ObjectConstants>>((md3dDevice.Get()),
-        5, true);
-    /*for (int i = 0; i < gNumFrameResources; i++) {
-        _frameResources.push_back(std::make_unique<FrameResources>(
-            md3dDevice.Get(), 1, (UINT)_allRenderItems.size()));
-    }*/
-}
-
-void Render::Window::BuildDescriptorHeaps()
-{
-    UINT objCount = (UINT)_opaqueRenderItems.size();
-    // Need a CBV descriptor for each object for each frame resource,
-    // +1 for the perPass CBV for each frame resource.
-    UINT numDescriptors = (objCount + 1) * gNumFrameResources;
-    // Save an offset to the start of the pass CBVs. These are the last descriptors.
-    _passCbvOffset = objCount * gNumFrameResources;
-    D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc = {};
-    cbvHeapDesc.NumDescriptors = numDescriptors;
-    cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    cbvHeapDesc.NodeMask = 0;
-    ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&cbvHeapDesc,
-        IID_PPV_ARGS(&_cbvHeap)));
-}
-
-void Render::Window::BuildConstantBufferViews()
-{
-    UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof
-    (ObjectConstants));
-    UINT objCount = (UINT)_opaqueRenderItems.size();
-    // Need a CBV descriptor for each object for each frame resource.
-    //for (int frameIndex = 0; frameIndex < gNumFrameResources; frameIndex++) {
-    int frameIndex = 0;
-    auto objectCB = ObjectCB->Resource();
-    for (UINT i = 0; i < objCount; ++i) {
-        D3D12_GPU_VIRTUAL_ADDRESS cbAddress =
-            objectCB->GetGPUVirtualAddress();
-        // Offset to the ith object constant buffer heap 
-        // in the current buffer.
-        cbAddress += i * objCBByteSize;
-        // Offset to the object CBV in the descriptor heap.
-        int heapIndex = frameIndex * objCount + i;
-        /* Once we know the descriptor increment size,
-        we can use one of the two CD3DX12_CPU_DESCRIPTOR_HANDLE::Offset
-        methods to offset the handle by n descriptors: */
-        auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(
-            _cbvHeap->GetCPUDescriptorHandleForHeapStart());
-        handle.Offset(heapIndex, mCbvSrvUavDescriptorSize);
-        D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-        cbvDesc.BufferLocation = cbAddress;
-        cbvDesc.SizeInBytes = objCBByteSize;
-        md3dDevice->CreateConstantBufferView(&cbvDesc, handle);
-    }
-    //}
-    UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof
-    (PassConstants));
-    // Last three descriptors are the pass CBVs for each frame resource.
-    //for (int frameIndex = 0; frameIndex < gNumFrameResources; frameIndex++) {
-    auto passCB = PassCB->Resource();
-    // Pass buffer only stores one cbuffer per frame resource.
-    D3D12_GPU_VIRTUAL_ADDRESS cbAddress = passCB->GetGPUVirtualAddress();
-    // Offset to the pass cbv in the descriptor heap.
-    int heapIndex = _passCbvOffset + frameIndex;
-    auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(
-        _cbvHeap->GetCPUDescriptorHandleForHeapStart());
-    handle.Offset(heapIndex, mCbvSrvUavDescriptorSize);
-    D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-    cbvDesc.BufferLocation = cbAddress;
-    cbvDesc.SizeInBytes = passCBByteSize;
-    md3dDevice->CreateConstantBufferView(&cbvDesc, handle);
-    //}
 }
 
 void Render::Window::BuildPSOs()
 {
-    /*		####	PSO FOR OPAQUE OBJECTS		####	 */
     D3D12_GRAPHICS_PIPELINE_STATE_DESC opaquePsoDesc;
     ZeroMemory(&opaquePsoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
     opaquePsoDesc.InputLayout = { _inputLayout.data(), (UINT)_inputLayout.size() };
@@ -425,40 +287,55 @@ void Render::Window::BuildPSOs()
     opaquePsoDesc.SampleDesc.Quality = m4xMsaaState ? (m4xMsaaQuality - 1) : 0;
     opaquePsoDesc.DSVFormat = mDepthStencilFormat;
     ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(
-        &opaquePsoDesc, IID_PPV_ARGS(&_psos["opaque"])));
+        &opaquePsoDesc, IID_PPV_ARGS(&_pso)));
+}
 
-    /*		####	PSO FOR OPAQUE WIREFRAME OBJECTS		####	 */
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC opaqueWireframePsoDesc = opaquePsoDesc;
-    opaqueWireframePsoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
-    ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(
-        &opaqueWireframePsoDesc, IID_PPV_ARGS(&_psos["opaque_wireframe"])));
+void Render::Window::setEngine(void* engine)
+{
+    _engine = engine;
+}
+
+void *Render::Window::getEngine()
+{
+    return _engine;
+}
+
+float Render::Window::getTotalTime()
+{
+    return _elapsedTime;
 }
 
 void Render::Window::Update(const GameTimer& gt)
 {
+    _elapsedTime = gt.TotalTime();
+    
+    SpaceEngine::Engine* engine = (SpaceEngine::Engine*) _engine;
+    std::vector<std::shared_ptr<SpaceEngine::ISystem>> systems = engine->getSystems();
     OnKeyboardInput(gt);
     UpdateCamera(gt);
+
+    for (int i = 0; i < systems.size(); i++) {
+        systems[i]->init(&engine->getEntities(), engine->getRenderApplication());
+        systems[i]->update(&engine->getEntities(), engine->getRenderApplication());
+    }
+
+    buildGameObjects();
+
     UpdateObjectCBs(gt);
     UpdateMainPassCB(gt);
 }
 
 void Render::Window::UpdateObjectCBs(const GameTimer& gt)
 {
-    auto currObjectCB = ObjectCB.get();
-    for (auto& e : _allRenderItems)
-    {
+    for (auto& e : _allRenderItems) {
         // Only update the cbuffer data if the constants have changed.
         // This needs to be tracked per frame resource.
-        if (e->NumFramesDirty > 0)
-        {
-            // get the word matrix of each drawable obj
-            DirectX::XMMATRIX world = XMLoadFloat4x4(&e->World);
-            ObjectConstants objConstants;
-            XMStoreFloat4x4(&objConstants.World, XMMatrixTranspose(world));
-            currObjectCB->CopyData(e->ObjCBIndex, objConstants);
-            // Next FrameResource need to be updated too.
-            e->NumFramesDirty--;
-        }
+        auto currObjectCB = e->ObjectCB.get();
+        // get the word matrix of each drawable obj
+        DirectX::XMMATRIX world = XMLoadFloat4x4(&e->World);
+        ObjectConstants objConstants;
+        XMStoreFloat4x4(&objConstants.World, XMMatrixTranspose(world));
+        currObjectCB->CopyData(0 , objConstants);
     }
 }
 
@@ -489,7 +366,7 @@ void Render::Window::UpdateMainPassCB(const GameTimer& gt)
     _mainPassCB.FarZ = 1000.0f;
     _mainPassCB.TotalTime = gt.TotalTime();
     _mainPassCB.DeltaTime = gt.DeltaTime();
-    auto currPassCB = PassCB.get();
+    auto currPassCB = passCB.get();
     currPassCB->CopyData(0, _mainPassCB);
 }
 
@@ -498,92 +375,66 @@ void Render::Window::DrawRenderItems(ID3D12GraphicsCommandList* cmdList,
 {
     UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(
         sizeof(ObjectConstants));
-    auto objectCB = ObjectCB->Resource();
 
     // For each render item...
     for (size_t i = 0; i < ritems.size(); ++i) {
         auto ri = ritems[i];
+        auto objectCB = ri->ObjectCB->Resource();
         cmdList->IASetVertexBuffers(0, 1, &ri->Geo->VertexBufferView());
         cmdList->IASetIndexBuffer(&ri->Geo->IndexBufferView());
         cmdList->IASetPrimitiveTopology(ri->PrimitiveType);
-        // Offset to the CBV in the descriptor heap for this object and
-        // for this frame resource.
-        UINT cbvIndex = /*_currFrameResourceIndex * */
-            /*(UINT)_opaqueRenderItems.size() + */ ri->ObjCBIndex;
-        auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(
-            _cbvHeap->GetGPUDescriptorHandleForHeapStart());
-        cbvHandle.Offset(cbvIndex, mCbvSrvUavDescriptorSize);
-        cmdList->SetGraphicsRootDescriptorTable(0, cbvHandle);
-        cmdList->DrawIndexedInstanced(ri->IndexCount, 1,
-            ri->StartIndexLocation, ri->BaseVertexLocation, 0);
+
+        D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = objectCB->GetGPUVirtualAddress();
+        cmdList->SetPipelineState(_pso.Get());
+        cmdList->SetGraphicsRootConstantBufferView(0, objCBAddress);
+        cmdList->DrawIndexedInstanced(ri->IndexCount, 1, ri->StartIndexLocation, ri->BaseVertexLocation, 0);
     }
 }
 
 void Render::Window::Draw(const GameTimer& gt)
 {
-    // auto cmdListAlloc = CmdListAlloc;
-     // Reuse the memory associated with command recording.
-     // We can only reset when the associated command lists have
-     // finished execution on the GPU.
     ThrowIfFailed(cmdListAlloc->Reset());
-    // A command list can be reset after it has been added to the
-    // command queue via ExecuteCommandList.
+    mCommandList->Reset(cmdListAlloc.Get(), nullptr);
+
+    // A command list can be reset after it has been added to the command queue via ExecuteCommandList.
     // Reusing the command list reuses memory.
-    if (_isWireframe) {
-        ThrowIfFailed(mCommandList->Reset(
-            cmdListAlloc.Get(), _psos["opaque_wireframe"].Get()));
-    }
-    else {
-        ThrowIfFailed(mCommandList->Reset(cmdListAlloc.Get(),
-            _psos["opaque"].Get()));
-    }
+
     mCommandList->RSSetViewports(1, &mScreenViewport);
     mCommandList->RSSetScissorRects(1, &mScissorRect);
-    // Indicate a state transition on the resource usage.
-    mCommandList->ResourceBarrier(1,
-        &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
-            D3D12_RESOURCE_STATE_PRESENT,
-            D3D12_RESOURCE_STATE_RENDER_TARGET));
-    // Clear the back buffer and depth buffer.
-    mCommandList->ClearRenderTargetView(CurrentBackBufferView(),
-        DirectX::Colors::LightSteelBlue, 0, nullptr);
-    mCommandList->ClearDepthStencilView(DepthStencilView(),
-        D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
-        1.0f, 0, 0, nullptr);
-    // Specify the buffers we are going to render to.
-    mCommandList->OMSetRenderTargets(1, &CurrentBackBufferView(),
-        true, &DepthStencilView());
-    ID3D12DescriptorHeap* descriptorHeaps[] = { _cbvHeap.Get() };
-    mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps),
-        descriptorHeaps);
-    mCommandList->SetGraphicsRootSignature(_rootSignature.Get());
-    int passCbvIndex = _passCbvOffset; /* + _currFrameResourceIndex */
 
-    auto passCbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(
-        _cbvHeap->GetGPUDescriptorHandleForHeapStart());
-    passCbvHandle.Offset(passCbvIndex, mCbvSrvUavDescriptorSize);
-    mCommandList->SetGraphicsRootDescriptorTable(1, passCbvHandle);
-    DrawRenderItems(mCommandList.Get(), _opaqueRenderItems);
     // Indicate a state transition on the resource usage.
-    mCommandList->ResourceBarrier(1,
-        &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
-            D3D12_RESOURCE_STATE_RENDER_TARGET,
-            D3D12_RESOURCE_STATE_PRESENT));
+    mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+        D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+
+    // Clear the back buffer and depth buffer.
+    mCommandList->ClearRenderTargetView(CurrentBackBufferView(), DirectX::Colors::LightSteelBlue, 0, nullptr);
+    mCommandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+
+    // Specify the buffers we are going to render to.
+    mCommandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
+
+    mCommandList->SetGraphicsRootSignature(_rootSignature.Get());
+
+    // Bind per-pass constant buffer.  We only need to do this once per-pass.
+    //auto passCB = mCurrFrameResource->PassCB->Resource();
+    mCommandList->SetGraphicsRootConstantBufferView(1, passCB->Resource()->GetGPUVirtualAddress());
+   // mCommandList->SetPipelineState(_psos["opaque"].Get());
+    DrawRenderItems(mCommandList.Get(), _opaqueRenderItems);
+
+    // Indicate a state transition on the resource usage.
+    mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+        D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+
     // Done recording commands.
     ThrowIfFailed(mCommandList->Close());
+
     // Add the command list to the queue for execution.
     ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
     mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+
     // Swap the back and front buffers
     ThrowIfFailed(mSwapChain->Present(0, 0));
     mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
-    // Advance the fence value to mark commands up to this fence point.
-    /*_currFrameResource->Fence = */// ++mCurrentFence;
-    // Add an instruction to the command queue to set a new fence point.
-    // Because we are on the GPU timeline, the new fence point won’t be
-    // set until the GPU finishes processing all the commands prior to 
-    // this Signal().
-    //mCommandQueue->Signal(mFence.Get(), mCurrentFence);
     FlushCommandQueue();
 }
 
@@ -688,7 +539,6 @@ void Render::Window::MessageLoop()
 
 void CALLBACK Render::Window::CreateGameWindow(LPCWSTR name, int width, int height)
 {
-
     InitializeVariables(width, height);
     CreateWindowClass();
     Initialize();

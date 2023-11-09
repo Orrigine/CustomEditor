@@ -10,7 +10,7 @@
 namespace SpaceEngine {
 	std::unordered_map<unsigned int, std::shared_ptr<SphereMesh>> SphereMesh::_entitiesSphereMesh = {};
 
-	SphereMesh::SphereMesh() : _meshType("sphere")
+	SphereMesh::SphereMesh() : _isBuild(false), _meshType("sphere")
 	{
 	}
 
@@ -32,5 +32,24 @@ namespace SpaceEngine {
 	std::string SphereMesh::getMeshType()
 	{
 		return _meshType;
+	}
+
+	void SphereMesh::init(void* engine, void* renderApp)
+	{
+
+	}
+	void SphereMesh::update(void* engine, void* renderApp)
+	{
+
+	}
+
+	void SphereMesh::setState(bool state) 
+	{
+		_isBuild = state;
+	}
+	
+	bool SphereMesh::getState() 
+	{
+		return _isBuild;
 	}
 }
