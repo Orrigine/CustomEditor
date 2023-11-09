@@ -56,7 +56,7 @@ struct RenderItem
     /* The set of data needed to submit a full draw call the rendering pipeline
     is a render item */
     RenderItem() = default;
-    // World matrix of the shape that describes the object’s local space
+    // World matrix of the shape that describes the objectï¿½s local space
     // relative to the world space, which defines the position,
     // orientation, and scale of the object in the world.
     DirectX::XMFLOAT4X4 World = MathHelper::Identity4x4();
