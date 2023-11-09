@@ -308,7 +308,15 @@ float Render::Window::getTotalTime()
 void Render::Window::Update(const GameTimer& gt)
 {
     _elapsedTime = gt.TotalTime();
-    
+
+    /*DirectX::XMMATRIX skullScale = DirectX::XMMatrixScaling(0.2f, 0.2f, 0.2f);
+    DirectX::XMMATRIX skullOffset = DirectX::XMMatrixTranslation(3.0f, 2.0f, 0.0f);
+    DirectX::XMMATRIX skullLocalRotate = DirectX::XMMatrixRotationY(2.0f * gt.TotalTime());
+
+    DirectX::XMMATRIX skullGlobalRotate = DirectX::XMMatrixRotationY(0.5f * gt.TotalTime());
+    if (_opaqueRenderItems.size() >= 3)
+        DirectX::XMStoreFloat4x4(&_opaqueRenderItems[2]->World, skullScale * skullLocalRotate * skullOffset * skullGlobalRotate);
+    */
     SpaceEngine::Engine* engine = (SpaceEngine::Engine*) _engine;
     std::vector<std::shared_ptr<SpaceEngine::ISystem>> systems = engine->getSystems();
     OnKeyboardInput(gt);
