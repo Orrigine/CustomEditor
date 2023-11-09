@@ -28,6 +28,7 @@ namespace SpaceEngine {
             _type = type;
             _isActive = true;
             SpaceEngine::id += 1;
+            _isBuild = false;
 
             _entitiesMapId[_id] = this;
             _entitiesMapName[_name] = this;
@@ -56,6 +57,16 @@ namespace SpaceEngine {
         bool getStatus() const
         {
             return _isActive;
+        }
+
+        void setIsBuild(bool build)
+        {
+            _isBuild = build;
+        }
+
+        bool getIsBuild()
+        {
+            return _isBuild;
         }
 
         // Adds a component class of type componentType to the GameObject.
@@ -124,6 +135,7 @@ namespace SpaceEngine {
             // transform
             //scene
             unsigned int _id;
+            bool _isBuild;
             std::string _name;
             std::string _type;
             bool _isActive;

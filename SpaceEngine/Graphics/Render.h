@@ -122,16 +122,20 @@ namespace Render
 
         void BuildPSOs();
     public:
-        void createGameObject(std::string type, const float* color, float p_x, float p_y, float p_z,
+        void createEntity(int id);
+        void setMesh(int id, std::string submesh);
+        void setTransform(int, float p_x, float p_y, float p_z,
             float scale_x, float scale_y, float scale_z);
+      //  void createGameObject(std::string type, const float* color, float p_x, float p_y, float p_z,
+        //    float scale_x, float scale_y, float scale_z);
     private:
-        void createShape(std::string submesh, float p_x, float p_y, float p_z,
-            float scale_x, float scale_y, float scale_z);
+       // void createShape(std::string submesh, float p_x, float p_y, float p_z,
+         //   float scale_x, float scale_y, float scale_z);
         //void buildShape(float p_x, float p_y, float p_z,
           //  float scale_x, float scale_y, float scale_z, const float* color);
         void buildBox(std::string name, const float* color);
         void buildSphere(std::string name, const float* color);
-        void buildGameObjects();
+        //void buildGameObjects();
 
         void buildGPUBuffers();
 
@@ -160,7 +164,8 @@ namespace Render
         std::vector<D3D12_INPUT_ELEMENT_DESC> _inputLayout;
 
         // List of all the render items.
-        std::vector<std::unique_ptr<RenderItem>> _allRenderItems;
+        std::vector<std::shared_ptr<RenderItem>> _allRenderItems;
+        std::unordered_map<int, std::shared_ptr<RenderItem>> _renderItems;
 
         // Render items divided by PSO.
         std::vector<RenderItem*> _opaqueRenderItems;

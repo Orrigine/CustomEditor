@@ -134,27 +134,6 @@ void Render::Window::BuildShadersAndInputLayout()
         D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }, };
 }
 
-void Render::Window::createGameObject(std::string type, const float* color,
-    float p_x, float p_y, float p_z, float scale_x, float scale_y,
-    float scale_z)
-{
-    std::shared_ptr<GameObject> gameObject(new GameObject({ type, color,
-        p_x, p_y, p_z, scale_x, scale_y, scale_z, false }));
-    _gameObjects.push_back(gameObject);
-}
-
-void Render::Window::buildGameObjects()
-{
-    for (int i = 0; i < _gameObjects.size(); i++) {
-        if (!_gameObjects[i]->is_build) {
-            createShape(_gameObjects[i]->type, _gameObjects[i]->p_x, _gameObjects[i]->p_y,
-                _gameObjects[i]->p_z, _gameObjects[i]->scale_x,
-                _gameObjects[i]->scale_y, _gameObjects[i]->scale_z);
-            _gameObjects[i]->is_build = true;
-        }
-    }
-}
-
 void Render::Window::buildBox(std::string name, const float* color)
 {
     GeometryGenerator::MeshData newGeo = _geoGen.CreateBox(1.0f, 1.0f,
@@ -212,10 +191,81 @@ void Render::Window::buildSphere(std::string name, const float* color)
     _geometries["shapeGeo"]->DrawArgs[name] = newGeoSubmesh;
 }
 
-void Render::Window::createShape(std::string submesh, float p_x, float p_y,
-    float p_z, float scale_x, float scale_y, float scale_z)
+/*
+void Render::Window::createGameObject(std::string type, const float* color,
+    float p_x, float p_y, float p_z, float scale_x, float scale_y,
+    float scale_z)
 {
-    auto newRenderItem = std::make_unique<RenderItem>();
+    std::shared_ptr<GameObject> gameObject(new GameObject({ type, color,
+        p_x, p_y, p_z, scale_x, scale_y, scale_z, false }));
+    _gameObjects.push_back(gameObject);
+}*/
+
+/*
+void Render::Window::buildGameObjects()
+{
+    for (int i = 0; i < _gameObjects.size(); i++) {
+        if (!_gameObjects[i]->is_build) {
+            createShape(_gameObjects[i]->type, _gameObjects[i]->p_x, _gameObjects[i]->p_y,
+                _gameObjects[i]->p_z, _gameObjects[i]->scale_x,
+                _gameObjects[i]->scale_y, _gameObjects[i]->scale_z);
+            _gameObjects[i]->is_build = true;
+        }
+    }
+}*/
+
+void Render::Window::createEntity(int id)
+{
+    std::unique_ptr<RenderItem> newRenderItem(new RenderItem());
+    DirectX::XMMATRIX world =
+        DirectX::XMMatrixTranslation(0, 0, 0)
+        * DirectX::XMMatrixScaling(1, 1, 1);
+    DirectX::XMStoreFloat4x4(&newRenderItem->World, world);
+   /* newRenderItem->ObjectCB = std::make_unique<UploadBuffer<ObjectConstants>>((md3dDevice.Get()), 1, true);
+    newRenderItem->Geo = _geometries["shapeGeo"].get();
+    newRenderItem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    newRenderItem->IndexCount = newRenderItem->Geo->DrawArgs[submesh].
+        IndexCount;
+    newRenderItem->StartIndexLocation =
+        newRenderItem->Geo->DrawArgs[submesh].StartIndexLocation;
+    newRenderItem->BaseVertexLocation =
+        newRenderItem->Geo->DrawArgs[submesh].BaseVertexLocation;
+    _opaqueRenderItems.push_back(newRenderItem.get());
+    _allRenderItems.push_back(std::move(newRenderItem));*/
+    _renderItems[id] = std::move( newRenderItem );
+    //_allRenderItems.push_back(_renderItems[id]);
+}
+
+void Render::Window::setTransform(int id, float p_x, float p_y, float p_z,
+    float scale_x, float scale_y, float scale_z)
+{
+    auto newRenderItem = _renderItems[id];
+    DirectX::XMMATRIX world =
+        DirectX::XMMatrixTranslation(p_x, p_y, p_z)
+        * DirectX::XMMatrixScaling(scale_x, scale_y, scale_z);
+    DirectX::XMStoreFloat4x4(&newRenderItem->World, world);
+}
+
+void Render::Window::setMesh(int id, std::string submesh)
+{
+    auto newRenderItem = _renderItems[id];
+    newRenderItem->ObjectCB = std::make_unique<UploadBuffer<ObjectConstants>>((md3dDevice.Get()), 1, true);
+    newRenderItem->Geo = _geometries["shapeGeo"].get();
+    newRenderItem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    newRenderItem->IndexCount = newRenderItem->Geo->DrawArgs[submesh].
+        IndexCount;
+    newRenderItem->StartIndexLocation =
+        newRenderItem->Geo->DrawArgs[submesh].StartIndexLocation;
+    newRenderItem->BaseVertexLocation =
+        newRenderItem->Geo->DrawArgs[submesh].BaseVertexLocation;
+    _opaqueRenderItems.push_back(newRenderItem.get());
+    _allRenderItems.push_back(newRenderItem);
+}
+
+//void Render::Window::createShape(std::string submesh, float p_x, float p_y,
+  //  float p_z, float scale_x, float scale_y, float scale_z)
+//{
+    /*auto newRenderItem = std::make_unique<RenderItem>();
     DirectX::XMMATRIX world =
         DirectX::XMMatrixTranslation(p_x, p_y, p_z)
         * DirectX::XMMatrixScaling(scale_x, scale_y, scale_z);
@@ -230,8 +280,8 @@ void Render::Window::createShape(std::string submesh, float p_x, float p_y,
     newRenderItem->BaseVertexLocation =
         newRenderItem->Geo->DrawArgs[submesh].BaseVertexLocation;
     _opaqueRenderItems.push_back(newRenderItem.get());
-    _allRenderItems.push_back(std::move(newRenderItem));
-}
+    _allRenderItems.push_back(std::move(newRenderItem));*/
+//}
 
 void Render::Window::buildGPUBuffers()
 {
@@ -309,14 +359,14 @@ void Render::Window::Update(const GameTimer& gt)
 {
     _elapsedTime = gt.TotalTime();
 
-    /*DirectX::XMMATRIX skullScale = DirectX::XMMatrixScaling(0.2f, 0.2f, 0.2f);
+    //DirectX::XMMATRIX skullScale = DirectX::XMMatrixScaling(0.2f, 0.2f, 0.2f);
     DirectX::XMMATRIX skullOffset = DirectX::XMMatrixTranslation(3.0f, 2.0f, 0.0f);
     DirectX::XMMATRIX skullLocalRotate = DirectX::XMMatrixRotationY(2.0f * gt.TotalTime());
 
     DirectX::XMMATRIX skullGlobalRotate = DirectX::XMMatrixRotationY(0.5f * gt.TotalTime());
     if (_opaqueRenderItems.size() >= 3)
-        DirectX::XMStoreFloat4x4(&_opaqueRenderItems[2]->World, skullScale * skullLocalRotate * skullOffset * skullGlobalRotate);
-    */
+        DirectX::XMStoreFloat4x4(&_opaqueRenderItems[2]->World, /*skullScale */ skullLocalRotate * skullOffset * skullGlobalRotate);
+
     SpaceEngine::Engine* engine = (SpaceEngine::Engine*) _engine;
     std::vector<std::shared_ptr<SpaceEngine::ISystem>> systems = engine->getSystems();
     OnKeyboardInput(gt);
@@ -327,7 +377,7 @@ void Render::Window::Update(const GameTimer& gt)
         systems[i]->update(&engine->getEntities(), engine->getRenderApplication());
     }
 
-    buildGameObjects();
+    //buildGameObjects();
 
     UpdateObjectCBs(gt);
     UpdateMainPassCB(gt);
