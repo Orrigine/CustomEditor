@@ -98,10 +98,19 @@
     <ClCompile Include="Source\Game.cpp" />
     <ClCompile Include="Source\pch.cpp" />
     <ClCompile Include="Source\WinMain.cpp" />
+    <ClCompile Include="State\StateMachine.cpp" />
+    <ClCompile Include="State\StateMainMenu.cpp" />
+    <ClCompile Include="State\StatePause.cpp" />
+    <ClCompile Include="State\StatePlay.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\Game.h" />
     <ClInclude Include="Headers\pch.h" />
+    <ClInclude Include="State\State.h" />
+    <ClInclude Include="State\StateMachine.h" />
+    <ClInclude Include="State\StateMainMenu.h" />
+    <ClInclude Include="State\StatePause.h" />
+    <ClInclude Include="State\StatePlay.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SpaceEngine\SpaceEngine.vcxproj">

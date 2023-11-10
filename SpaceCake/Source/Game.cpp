@@ -33,8 +33,10 @@ void Game::init()
 
     // Set initial values
     _isRunning = true;
-
     _engine.createWindow(1920, 1080, L"SpaceCake");
+
+    _stateMachine = new StateMachine();
+
     _engine.init();
 
     std::shared_ptr<SpaceEngine::Entity> cube_1 = _engine.createEntity("cube1");

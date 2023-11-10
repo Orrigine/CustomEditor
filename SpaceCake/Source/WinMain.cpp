@@ -14,5 +14,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
     SpaceEngine::Engine engine(hInstance);
     Game game = Game(engine);
     game.init();
+    // check if current state is Mainemenu
+
+    // if (game._stateMachine.getCurrentState() == StateMainMenu::getInstance())
     game.run();
 }

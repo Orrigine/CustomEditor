@@ -1,4 +1,5 @@
 #include "Engine.h"
+#include "State/StateMachine.h"
 // #include "Engine/Core/Core.h"
 
 #include <memory>
@@ -14,6 +15,9 @@ public:
 
     static std::shared_ptr<Game> GetInstance();
 
+    // gettor for the state machine
+
+    StateMachine _stateMachine;
 private:
     static std::shared_ptr<Game> _instance;
     SpaceEngine::Engine _engine;
