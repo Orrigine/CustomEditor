@@ -3,7 +3,7 @@
 namespace SpaceEngine {
     
     Engine::Engine(HINSTANCE hInstance) : _hInstance(hInstance),
-        _renderApplication(new Render::Window(hInstance))//, _renderSystem(new RenderSystem())
+        _renderApplication(new Render::Window(hInstance))
     {
         std::shared_ptr<RenderSystem> render(new RenderSystem());
         std::shared_ptr<ScriptSystem> script(new ScriptSystem());
