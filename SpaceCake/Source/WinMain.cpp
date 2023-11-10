@@ -16,6 +16,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
     game.init();
     // check if current state is Mainemenu
 
-    // if (game._stateMachine.getCurrentState() == StateMainMenu::getInstance())
+     //if (game._stateMachine->getCurrentState() == StateMainMenu::getInstance())
     game.run();
 }

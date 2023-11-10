@@ -1,15 +1,16 @@
 #include <Graphics.h>
 #include "Engine.h"
-// #include "Engine/System/ISystem.h"
+//#include "Engine/System/ISystem.h"
 
 int const gNumFrameResources = 1;
+
 
 WCHAR WindowClass[MAX_NAME_STRING] = L"SpaceEngineWindowClass";
 std::shared_ptr<Render::Window> Render::Window::_instance = nullptr;
 
 Render::Window::Window(HINSTANCE hInstance) : D3DApp(hInstance),
-                                              _shapesIndices(1), _lastGeoIndexOffset(0), _lastGeoIndicesSize(0),
-                                              _lastGeoVertexOffset(0), _lastGeoVerticesSize(0), _objCBIndex(0), _engine(nullptr)
+_shapesIndices(1), _lastGeoIndexOffset(0), _lastGeoIndicesSize(0),
+_lastGeoVertexOffset(0), _lastGeoVerticesSize(0), _objCBIndex(0), _engine(nullptr)
 {
     auto geo = std::make_unique<MeshGeometry>();
 
@@ -25,8 +26,7 @@ Render::Window::~Window()
 
 LRESULT CALLBACK Render::Window::WindowProcess(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    switch (msg)
-    {
+    switch (msg) {
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
@@ -76,7 +76,7 @@ bool Render::Window::Initialize()
     BuildFrameResources();
     BuildPSOs();
     ThrowIfFailed(mCommandList->Close());
-    ID3D12CommandList *cmdsLists[] = {mCommandList.Get()};
+    ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
     mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
     FlushCommandQueue();
     return true;
@@ -103,19 +103,19 @@ void Render::Window::BuildRootSignature()
     slotRootParameter[0].InitAsConstantBufferView(0);
     slotRootParameter[1].InitAsConstantBufferView(1);
     CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, slotRootParameter, 0, nullptr,
-                                            D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+        D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
     Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSig = nullptr;
     Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
     HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc,
-                                             D3D_ROOT_SIGNATURE_VERSION_1, serializedRootSig.GetAddressOf(),
-                                             errorBlob.GetAddressOf());
+        D3D_ROOT_SIGNATURE_VERSION_1, serializedRootSig.GetAddressOf(),
+        errorBlob.GetAddressOf());
     if (errorBlob != nullptr)
-        ::OutputDebugStringA((char *)errorBlob->GetBufferPointer());
+        ::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
     ThrowIfFailed(hr);
     ThrowIfFailed(md3dDevice->CreateRootSignature(0,
-                                                  serializedRootSig->GetBufferPointer(), serializedRootSig->GetBufferSize(),
-                                                  IID_PPV_ARGS(_rootSignature.GetAddressOf())));
+        serializedRootSig->GetBufferPointer(), serializedRootSig->GetBufferSize(),
+        IID_PPV_ARGS(_rootSignature.GetAddressOf())));
 }
 
 void Render::Window::BuildShadersAndInputLayout()
@@ -128,40 +128,37 @@ void Render::Window::BuildShadersAndInputLayout()
     /* An imput layout contain the description of each element
         in a vertex structure */
     _inputLayout = {
-        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
-         D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-        {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12,
-         D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-    };
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
+        D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12,
+        D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }, };
 }
 
-void Render::Window::createGameObject(std::string type, const float *color,
-                                      float p_x, float p_y, float p_z, float scale_x, float scale_y,
-                                      float scale_z)
+void Render::Window::createGameObject(std::string type, const float* color,
+    float p_x, float p_y, float p_z, float scale_x, float scale_y,
+    float scale_z)
 {
-    std::shared_ptr<GameObject> gameObject(new GameObject({type, color,
-                                                           p_x, p_y, p_z, scale_x, scale_y, scale_z, false}));
+    std::shared_ptr<GameObject> gameObject(new GameObject({ type, color,
+        p_x, p_y, p_z, scale_x, scale_y, scale_z, false }));
     _gameObjects.push_back(gameObject);
 }
 
 void Render::Window::buildGameObjects()
 {
-    for (int i = 0; i < _gameObjects.size(); i++)
-    {
-        if (!_gameObjects[i]->is_build)
-        {
+    for (int i = 0; i < _gameObjects.size(); i++) {
+        if (!_gameObjects[i]->is_build) {
             createShape(_gameObjects[i]->type, _gameObjects[i]->p_x, _gameObjects[i]->p_y,
-                        _gameObjects[i]->p_z, _gameObjects[i]->scale_x,
-                        _gameObjects[i]->scale_y, _gameObjects[i]->scale_z);
+                _gameObjects[i]->p_z, _gameObjects[i]->scale_x,
+                _gameObjects[i]->scale_y, _gameObjects[i]->scale_z);
             _gameObjects[i]->is_build = true;
         }
     }
 }
 
-void Render::Window::buildBox(std::string name, const float *color)
+void Render::Window::buildBox(std::string name, const float* color)
 {
     GeometryGenerator::MeshData newGeo = _geoGen.CreateBox(1.0f, 1.0f,
-                                                           1.0f, 3);
+        1.0f, 3);
     UINT newGeoVertexOffset = _lastGeoVertexOffset + _lastGeoVerticesSize;
     _lastGeoVertexOffset = newGeoVertexOffset;
     _lastGeoVerticesSize = newGeo.Vertices.size();
@@ -175,22 +172,22 @@ void Render::Window::buildBox(std::string name, const float *color)
     UINT k = _vertices.size();
     /* Copies each geometry vertex into a big one */
     _vertices.resize(_vertices.size() + newGeo.Vertices.size());
-    for (size_t i = 0; i < newGeo.Vertices.size(); i++, k++)
-    {
+    for (size_t i = 0; i < newGeo.Vertices.size(); i++, k++) {
         _vertices[k].Pos = newGeo.Vertices[i].Position;
         _vertices[k].Color = DirectX::XMFLOAT4(color);
     }
     /* Copies each geometry indices into a big one*/
     _indices.insert(_indices.end(),
-                    std::begin(newGeo.GetIndices16()),
-                    std::end(newGeo.GetIndices16()));
+        std::begin(newGeo.GetIndices16()),
+        std::end(newGeo.GetIndices16()));
     // create vertices and indices upload buffer
     _geometries["shapeGeo"]->DrawArgs[name] = newGeoSubmesh;
     // createShape(std::to_string(_shapesIndices), p_x, p_y, p_z, scale_x, scale_y, scale_z);
     _shapesIndices++;
 }
 
-void Render::Window::buildSphere(std::string name, const float *color)
+
+void Render::Window::buildSphere(std::string name, const float* color)
 {
     GeometryGenerator::MeshData newGeo = _geoGen.CreateSphere(1.0f, 20, 20);
     UINT newGeoVertexOffset = _lastGeoVertexOffset + _lastGeoVerticesSize;
@@ -205,28 +202,29 @@ void Render::Window::buildSphere(std::string name, const float *color)
     newGeoSubmesh.BaseVertexLocation = newGeoVertexOffset;
     UINT k = _vertices.size();
     _vertices.resize(_vertices.size() + newGeo.Vertices.size());
-    for (size_t i = 0; i < newGeo.Vertices.size(); i++, k++)
-    {
+    for (size_t i = 0; i < newGeo.Vertices.size(); i++, k++) {
         _vertices[k].Pos = newGeo.Vertices[i].Position;
         _vertices[k].Color = DirectX::XMFLOAT4(color);
     }
     _indices.insert(_indices.end(),
-                    std::begin(newGeo.GetIndices16()),
-                    std::end(newGeo.GetIndices16()));
+        std::begin(newGeo.GetIndices16()),
+        std::end(newGeo.GetIndices16()));
     _geometries["shapeGeo"]->DrawArgs[name] = newGeoSubmesh;
 }
 
 void Render::Window::createShape(std::string submesh, float p_x, float p_y,
-                                 float p_z, float scale_x, float scale_y, float scale_z)
+    float p_z, float scale_x, float scale_y, float scale_z)
 {
     auto newRenderItem = std::make_unique<RenderItem>();
     DirectX::XMMATRIX world =
-        DirectX::XMMatrixTranslation(p_x, p_y, p_z) * DirectX::XMMatrixScaling(scale_x, scale_y, scale_z);
+        DirectX::XMMatrixTranslation(p_x, p_y, p_z)
+        * DirectX::XMMatrixScaling(scale_x, scale_y, scale_z);
     DirectX::XMStoreFloat4x4(&newRenderItem->World, world);
     newRenderItem->ObjectCB = std::make_unique<UploadBuffer<ObjectConstants>>((md3dDevice.Get()), 1, true);
     newRenderItem->Geo = _geometries["shapeGeo"].get();
     newRenderItem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-    newRenderItem->IndexCount = newRenderItem->Geo->DrawArgs[submesh].IndexCount;
+    newRenderItem->IndexCount = newRenderItem->Geo->DrawArgs[submesh].
+        IndexCount;
     newRenderItem->StartIndexLocation =
         newRenderItem->Geo->DrawArgs[submesh].StartIndexLocation;
     newRenderItem->BaseVertexLocation =
@@ -241,14 +239,14 @@ void Render::Window::buildGPUBuffers()
     const UINT ibByteSize = (UINT)_indices.size() * sizeof(std::uint16_t);
     ThrowIfFailed(D3DCreateBlob(vbByteSize, &_geometries["shapeGeo"]->VertexBufferCPU));
     CopyMemory(_geometries["shapeGeo"]->VertexBufferCPU->GetBufferPointer(),
-               _vertices.data(), vbByteSize);
+        _vertices.data(), vbByteSize);
     ThrowIfFailed(D3DCreateBlob(ibByteSize, &_geometries["shapeGeo"]->IndexBufferCPU));
     CopyMemory(_geometries["shapeGeo"]->IndexBufferCPU->GetBufferPointer(), _indices.data(),
-               ibByteSize);
+        ibByteSize);
     _geometries["shapeGeo"]->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(),
-                                                                            mCommandList.Get(), _vertices.data(), vbByteSize, _geometries["shapeGeo"]->VertexBufferUploader);
+        mCommandList.Get(), _vertices.data(), vbByteSize, _geometries["shapeGeo"]->VertexBufferUploader);
     _geometries["shapeGeo"]->IndexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(),
-                                                                           mCommandList.Get(), _indices.data(), ibByteSize, _geometries["shapeGeo"]->IndexBufferUploader);
+        mCommandList.Get(), _indices.data(), ibByteSize, _geometries["shapeGeo"]->IndexBufferUploader);
 
     _geometries["shapeGeo"]->VertexByteStride = sizeof(Vertex);
     _geometries["shapeGeo"]->VertexBufferByteSize = vbByteSize;
@@ -258,23 +256,25 @@ void Render::Window::buildGPUBuffers()
 
 void Render::Window::BuildFrameResources()
 {
-    ThrowIfFailed((md3dDevice.Get())->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(cmdListAlloc.GetAddressOf())));
+    ThrowIfFailed((md3dDevice.Get())->CreateCommandAllocator(
+        D3D12_COMMAND_LIST_TYPE_DIRECT,
+        IID_PPV_ARGS(cmdListAlloc.GetAddressOf())));
     passCB = std::make_unique<UploadBuffer<PassConstants>>((md3dDevice.Get()),
-                                                           1, true);
+        1, true);
 }
 
 void Render::Window::BuildPSOs()
 {
     D3D12_GRAPHICS_PIPELINE_STATE_DESC opaquePsoDesc;
     ZeroMemory(&opaquePsoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
-    opaquePsoDesc.InputLayout = {_inputLayout.data(), (UINT)_inputLayout.size()};
+    opaquePsoDesc.InputLayout = { _inputLayout.data(), (UINT)_inputLayout.size() };
     opaquePsoDesc.pRootSignature = _rootSignature.Get();
     opaquePsoDesc.VS = {
-        reinterpret_cast<BYTE *>(_shaders["standardVS"]->GetBufferPointer()),
-        _shaders["standardVS"]->GetBufferSize()};
+        reinterpret_cast<BYTE*>(_shaders["standardVS"]->GetBufferPointer()),
+        _shaders["standardVS"]->GetBufferSize() };
     opaquePsoDesc.PS = {
-        reinterpret_cast<BYTE *>(_shaders["opaquePS"]->GetBufferPointer()),
-        _shaders["opaquePS"]->GetBufferSize()};
+        reinterpret_cast<BYTE*>(_shaders["opaquePS"]->GetBufferPointer()),
+        _shaders["opaquePS"]->GetBufferSize() };
     opaquePsoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     opaquePsoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
     opaquePsoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
@@ -290,7 +290,7 @@ void Render::Window::BuildPSOs()
         &opaquePsoDesc, IID_PPV_ARGS(&_pso)));
 }
 
-void Render::Window::setEngine(void *engine)
+void Render::Window::setEngine(void* engine)
 {
     _engine = engine;
 }
@@ -305,7 +305,7 @@ float Render::Window::getTotalTime()
     return _elapsedTime;
 }
 
-void Render::Window::Update(const GameTimer &gt)
+void Render::Window::Update(const GameTimer& gt)
 {
     _elapsedTime = gt.TotalTime();
 
@@ -317,13 +317,12 @@ void Render::Window::Update(const GameTimer &gt)
     if (_opaqueRenderItems.size() >= 3)
         DirectX::XMStoreFloat4x4(&_opaqueRenderItems[2]->World, skullScale * skullLocalRotate * skullOffset * skullGlobalRotate);
     */
-    SpaceEngine::Engine *engine = (SpaceEngine::Engine *)_engine;
+    SpaceEngine::Engine* engine = (SpaceEngine::Engine*) _engine;
     std::vector<std::shared_ptr<SpaceEngine::ISystem>> systems = engine->getSystems();
     OnKeyboardInput(gt);
     UpdateCamera(gt);
 
-    for (int i = 0; i < systems.size(); i++)
-    {
+    for (int i = 0; i < systems.size(); i++) {
         systems[i]->init(&engine->getEntities(), engine->getRenderApplication());
         systems[i]->update(&engine->getEntities(), engine->getRenderApplication());
     }
@@ -334,10 +333,9 @@ void Render::Window::Update(const GameTimer &gt)
     UpdateMainPassCB(gt);
 }
 
-void Render::Window::UpdateObjectCBs(const GameTimer &gt)
+void Render::Window::UpdateObjectCBs(const GameTimer& gt)
 {
-    for (auto &e : _allRenderItems)
-    {
+    for (auto& e : _allRenderItems) {
         // Only update the cbuffer data if the constants have changed.
         // This needs to be tracked per frame resource.
         auto currObjectCB = e->ObjectCB.get();
@@ -345,16 +343,17 @@ void Render::Window::UpdateObjectCBs(const GameTimer &gt)
         DirectX::XMMATRIX world = XMLoadFloat4x4(&e->World);
         ObjectConstants objConstants;
         XMStoreFloat4x4(&objConstants.World, XMMatrixTranspose(world));
-        currObjectCB->CopyData(0, objConstants);
+        currObjectCB->CopyData(0 , objConstants);
     }
 }
 
-void Render::Window::UpdateMainPassCB(const GameTimer &gt)
+void Render::Window::UpdateMainPassCB(const GameTimer& gt)
 {
     DirectX::XMMATRIX view = _camera.GetView();
     DirectX::XMMATRIX proj = _camera.GetProj();
-    // DirectX::XMMATRIX view = XMLoadFloat4x4(&_view);
-    // DirectX::XMMATRIX proj = XMLoadFloat4x4(&_proj);
+   // DirectX::XMMATRIX view = XMLoadFloat4x4(&_view);
+   // DirectX::XMMATRIX proj = XMLoadFloat4x4(&_proj);
+
 
     DirectX::XMMATRIX viewProj = XMMatrixMultiply(view, proj);
     DirectX::XMMATRIX invView = XMMatrixInverse(
@@ -369,12 +368,13 @@ void Render::Window::UpdateMainPassCB(const GameTimer &gt)
     XMStoreFloat4x4(&_mainPassCB.InvProj, XMMatrixTranspose(invProj));
     XMStoreFloat4x4(&_mainPassCB.ViewProj, XMMatrixTranspose(viewProj));
     XMStoreFloat4x4(&_mainPassCB.InvViewProj,
-                    XMMatrixTranspose(invViewProj));
+        XMMatrixTranspose(invViewProj));
     //_mainPassCB.EyePosW = _eyePos;
     _mainPassCB.EyePosW = _camera.GetPosition3f();
     _mainPassCB.RenderTargetSize = DirectX::XMFLOAT2((float)mClientWidth,
-                                                     (float)mClientHeight);
-    _mainPassCB.InvRenderTargetSize = DirectX::XMFLOAT2(1.0f / mClientWidth, 1.0f / mClientHeight);
+        (float)mClientHeight);
+    _mainPassCB.InvRenderTargetSize = DirectX::XMFLOAT2(1.0f / mClientWidth, 1.0f
+        / mClientHeight);
     _mainPassCB.NearZ = 1.0f;
     _mainPassCB.FarZ = 1000.0f;
     _mainPassCB.TotalTime = gt.TotalTime();
@@ -383,15 +383,14 @@ void Render::Window::UpdateMainPassCB(const GameTimer &gt)
     currPassCB->CopyData(0, _mainPassCB);
 }
 
-void Render::Window::DrawRenderItems(ID3D12GraphicsCommandList *cmdList,
-                                     const std::vector<RenderItem *> &ritems)
+void Render::Window::DrawRenderItems(ID3D12GraphicsCommandList* cmdList,
+    const std::vector<RenderItem*>& ritems)
 {
     UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(
         sizeof(ObjectConstants));
 
     // For each render item...
-    for (size_t i = 0; i < ritems.size(); ++i)
-    {
+    for (size_t i = 0; i < ritems.size(); ++i) {
         auto ri = ritems[i];
         auto objectCB = ri->ObjectCB->Resource();
         cmdList->IASetVertexBuffers(0, 1, &ri->Geo->VertexBufferView());
@@ -405,7 +404,7 @@ void Render::Window::DrawRenderItems(ID3D12GraphicsCommandList *cmdList,
     }
 }
 
-void Render::Window::Draw(const GameTimer &gt)
+void Render::Window::Draw(const GameTimer& gt)
 {
     ThrowIfFailed(cmdListAlloc->Reset());
     mCommandList->Reset(cmdListAlloc.Get(), nullptr);
@@ -418,7 +417,7 @@ void Render::Window::Draw(const GameTimer &gt)
 
     // Indicate a state transition on the resource usage.
     mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
-                                                                           D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+        D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
     // Clear the back buffer and depth buffer.
     mCommandList->ClearRenderTargetView(CurrentBackBufferView(), DirectX::Colors::LightSteelBlue, 0, nullptr);
@@ -430,24 +429,24 @@ void Render::Window::Draw(const GameTimer &gt)
     mCommandList->SetGraphicsRootSignature(_rootSignature.Get());
 
     // Bind per-pass constant buffer.  We only need to do this once per-pass.
-    // auto passCB = mCurrFrameResource->PassCB->Resource();
+    //auto passCB = mCurrFrameResource->PassCB->Resource();
     mCommandList->SetGraphicsRootConstantBufferView(1, passCB->Resource()->GetGPUVirtualAddress());
-    // mCommandList->SetPipelineState(_psos["opaque"].Get());
+   // mCommandList->SetPipelineState(_psos["opaque"].Get());
     DrawRenderItems(mCommandList.Get(), _opaqueRenderItems);
 
     // Indicate a state transition on the resource usage.
     mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
-                                                                           D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+        D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 
     // Done recording commands.
     ThrowIfFailed(mCommandList->Close());
 
     // Add the command list to the queue for execution.
-    ID3D12CommandList *cmdsLists[] = {mCommandList.Get()};
+    ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
     mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
     // Swap the back and front buffers
-    ThrowIfFailed(mSwapChain->Present(1, 0));
+    ThrowIfFailed(mSwapChain->Present(0, 0));
     mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
     FlushCommandQueue();
 }
@@ -488,7 +487,8 @@ void Render::Window::OnMouseMove(WPARAM btnState, int x, int y)
     mLastMousePos.y = y;
 }
 
-void Render::Window::OnKeyboardInput(const GameTimer &gt)
+
+void Render::Window::OnKeyboardInput(const GameTimer& gt)
 {
     const float dt = gt.DeltaTime();
 
@@ -506,25 +506,26 @@ void Render::Window::OnKeyboardInput(const GameTimer &gt)
     _camera.UpdateViewMatrix();
 }
 
-void Render::Window::UpdateCamera(const GameTimer &gt)
+void Render::Window::UpdateCamera(const GameTimer& gt)
 {
     // Convert Spherical to Cartesian coordinates.
-    /* _eyePos.x = mRadius * sinf(mPhi) * cosf(mTheta);
-     _eyePos.z = mRadius * sinf(mPhi) * sinf(mTheta);
-     _eyePos.y = mRadius * cosf(mPhi);
+   /* _eyePos.x = mRadius * sinf(mPhi) * cosf(mTheta);
+    _eyePos.z = mRadius * sinf(mPhi) * sinf(mTheta);
+    _eyePos.y = mRadius * cosf(mPhi);
 
-     // Build the view matrix.
-     DirectX::XMVECTOR pos = DirectX::XMVectorSet(_eyePos.x, _eyePos.y, _eyePos.z, 1.0f);
-     DirectX::XMVECTOR target = DirectX::XMVectorZero();
-     DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+    // Build the view matrix.
+    DirectX::XMVECTOR pos = DirectX::XMVectorSet(_eyePos.x, _eyePos.y, _eyePos.z, 1.0f);
+    DirectX::XMVECTOR target = DirectX::XMVectorZero();
+    DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
-     DirectX::XMMATRIX view = DirectX::XMMatrixLookAtLH(pos, target, up);
-     DirectX::XMStoreFloat4x4(&_view, view);*/
+    DirectX::XMMATRIX view = DirectX::XMMatrixLookAtLH(pos, target, up);
+    DirectX::XMStoreFloat4x4(&_view, view);*/
 }
+
 
 void Render::Window::MessageLoop()
 {
-    MSG msg = {0};
+    MSG msg = { 0 };
 
     if (msg.message == WM_QUIT)
     {
@@ -544,6 +545,8 @@ void Render::Window::MessageLoop()
         }
     }
 }
+
+
 
 void CALLBACK Render::Window::CreateGameWindow(LPCWSTR name, int width, int height)
 {

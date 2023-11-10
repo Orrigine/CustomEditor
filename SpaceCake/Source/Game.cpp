@@ -4,6 +4,7 @@
 // #include "Game.h"
 
 std::shared_ptr<Game> Game::_instance = nullptr;
+std::shared_ptr<StateMachine> Game::_stateMachine = nullptr;
 
 void myScript(void *engine, void *renderApp)
 {
@@ -35,7 +36,7 @@ void Game::init()
     _isRunning = true;
     _engine.createWindow(1920, 1080, L"SpaceCake");
 
-    _stateMachine = new StateMachine();
+    _stateMachine = std::make_shared<StateMachine>();
 
     _engine.init();
 

@@ -17,7 +17,7 @@ public:
 
     // gettor for the state machine
 
-    StateMachine _stateMachine;
+    static std::shared_ptr<StateMachine> _stateMachine;
 private:
     static std::shared_ptr<Game> _instance;
     SpaceEngine::Engine _engine;
