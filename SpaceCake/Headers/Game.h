@@ -1,7 +1,8 @@
 #include "Engine.h"
 //#include "Engine/Core/Core.h"
-
+#include <time.h>
 #include <memory>
+#include <cstdlib>
 
 class Game
 {
@@ -11,6 +12,7 @@ public:
 
     void init();
     void run();
+    void createCrates(int nb);
 
     static std::shared_ptr<Game> GetInstance();
 
