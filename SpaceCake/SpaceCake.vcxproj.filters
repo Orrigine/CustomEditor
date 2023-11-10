@@ -32,12 +32,39 @@
     <ClCompile Include="Source\Game.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="State\StateMachine.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="State\StateMainMenu.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="State\StatePause.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="State\StatePlay.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\pch.h">
       <Filter>Source\pch</Filter>
     </ClInclude>
     <ClInclude Include="Headers\Game.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="State\State.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="State\StateMachine.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="State\StateMainMenu.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="State\StatePause.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="State\StatePlay.h">
       <Filter>Resources</Filter>
     </ClInclude>
   </ItemGroup>

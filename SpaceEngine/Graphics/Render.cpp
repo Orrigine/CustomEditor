@@ -480,6 +480,7 @@ void Render::Window::OnMouseMove(WPARAM btnState, int x, int y)
     mLastMousePos.y = y;
 }
 
+
 void Render::Window::OnKeyboardInput(const GameTimer& gt)
 {
     const float dt = gt.DeltaTime();
